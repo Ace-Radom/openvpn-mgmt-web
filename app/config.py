@@ -12,9 +12,11 @@ config = {
         "public_ip": None,
         "private_ip": None,
         "port": None,
-        "use_https": False
+        "domain_name": None,
+        "use_https": False,
         # all traffics should be forwarded by nginx
         # so if nginx enables https, we need to know
+        "use_domain_name": False,
     },
     "gmail": {
         "discovery_path": None,
@@ -66,11 +68,25 @@ def parse_config(config_path: str):
         ):
             config["server"]["port"] = int(parser["server"]["port"])
         if (
+            parser.has_option("server", "domain_name")
+            and len(parser["server"]["domain_name"]) != 0
+        ):
+            config["server"]["domain_name"] = parser["server"]["domain_name"]
+        if (
             parser.has_option("server", "use_https")
             and len(parser["server"]["use_https"]) != 0
             and parser["server"]["use_https"].isdigit()
         ):
             config["server"]["use_https"] = int(parser["server"]["use_https"]) != 0
+        if (
+            parser.has_option("server", "use_domain_name")
+            and len(parser["server"]["use_domain_name"]) != 0
+            and parser["server"]["use_domain_name"].isdigit()
+            and config["server"]["domain_name"] is not None
+        ):
+            config["server"]["use_domain_name"] = (
+                int(parser["server"]["use_domain_name"]) != 0
+            )
 
     if parser.has_section("gmail"):
         if (

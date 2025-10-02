@@ -6,22 +6,26 @@ ZZDS_SCHOOL_WLAN_IP = ipaddress.ip_network("31.22.24.219")
 
 
 def build_server_link(route: str, is_public_link: bool = False) -> str:
-    if is_public_link:
-        host = config.config["server"]["public_ip"]
+    if config.config["server"]["use_domain_name"]:
+        host = config.config["server"]["domain_name"]
     else:
-        host = config.config["server"]["private_ip"]
+        if is_public_link:
+            host_ip = config.config["server"]["public_ip"]
+            host_port = config.config["server"]["port"]
+        else:
+            host_ip = config.config["server"]["private_ip"]
+            host_port = config.config["server"]["port"]
+        host = f"{ host_ip }:{ host_port }"
 
     if config.config["server"]["use_https"]:
         protocol = "https"
     else:
         protocol = "http"
 
-    port = config.config["server"]["port"]
-
     if route[0] == "/":
         route = route[1:]
 
-    return f"{ protocol }://{ host }:{ port }/{ route }"
+    return f"{ protocol }://{ host }/{ route }"
 
 
 def is_valid_ipv4(ip: str) -> bool:

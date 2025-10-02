@@ -7,7 +7,9 @@ db_path=/var/openvpn-mgmt/web/users.db
 public_ip=
 private_ip=
 port=
+domain_name=
 use_https=0
+use_domain_name=0
 
 [gmail]
 discovery_path=/var/openvpn-mgmt/web/gmail/gmail_v1_discovery.json
