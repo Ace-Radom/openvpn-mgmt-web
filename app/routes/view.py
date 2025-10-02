@@ -31,6 +31,7 @@ def register():
     if config.config["app"]["is_production_env"]:
         real_ip = request.headers.get("X-Real-IP", "")
         if not utils.is_request_from_zzds_school_wlan(real_ip):
+            session["allow_error"] = True
             return redirect(
                 url_for("view.error", msg="禁止注册", next_url=url_for("view.login"))
             )
