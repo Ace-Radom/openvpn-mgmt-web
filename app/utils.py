@@ -43,5 +43,5 @@ def is_request_from_zzds_school_wlan(remote_ip: str) -> bool:
     except:
         return False
 
-    if remote in config.config["registration"]["zzds_school_wlan_ip"]:
+    if remote == config.config["registration"]["zzds_school_wlan_ip"]:
         return True
