@@ -2,8 +2,6 @@ import ipaddress
 
 from app import config
 
-ZZDS_SCHOOL_WLAN_IP = ipaddress.ip_network("31.22.24.219")
-
 
 def build_server_link(route: str, is_public_link: bool = False) -> str:
     if config.config["server"]["use_domain_name"]:
@@ -45,5 +43,5 @@ def is_request_from_zzds_school_wlan(remote_ip: str) -> bool:
     except:
         return False
 
-    if remote in ZZDS_SCHOOL_WLAN_IP:
+    if remote in config.config["registration"]["zzds_school_wlan_ip"]:
         return True

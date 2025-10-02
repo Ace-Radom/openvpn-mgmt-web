@@ -1,4 +1,5 @@
 import configparser
+import ipaddress
 
 from app.utils import is_valid_ipv4
 
@@ -17,6 +18,10 @@ config = {
         # all traffics should be forwarded by nginx
         # so if nginx enables https, we need to know
         "use_domain_name": False,
+    },
+    "registration": {
+        "zzds_school_wlan_ip": None,
+        "allow_all_registration_request_under_production_env": False,
     },
     "gmail": {
         "discovery_path": None,
@@ -86,6 +91,41 @@ def parse_config(config_path: str):
         ):
             config["server"]["use_domain_name"] = (
                 int(parser["server"]["use_domain_name"]) != 0
+            )
+
+    if parser.has_section("registration"):
+        if (
+            parser.has_option("registration", "zzds_school_wlan_ip")
+            and len(parser["registration"]["zzds_school_wlan_ip"]) != 0
+            and is_valid_ipv4(parser["registration"]["zzds_school_wlan_ip"])
+        ):
+            config["registration"]["zzds_school_wlan_ip"] = ipaddress.ip_address(
+                parser["registration"]["zzds_school_wlan_ip"]
+            )
+        # build IPv4Address object here to avoid multi-construction
+        if (
+            parser.has_option(
+                "registration", "allow_all_registration_request_under_production_env"
+            )
+            and len(
+                parser["registration"][
+                    "allow_all_registration_request_under_production_env"
+                ]
+            )
+            != 0
+            and parser["registration"][
+                "allow_all_registration_request_under_production_env"
+            ].isdigit()
+        ):
+            config["registration"][
+                "allow_all_registration_request_under_production_env"
+            ] = (
+                int(
+                    parser["registration"][
+                        "allow_all_registration_request_under_production_env"
+                    ]
+                )
+                != 0
             )
 
     if parser.has_section("gmail"):

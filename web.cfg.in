@@ -11,6 +11,10 @@ domain_name=
 use_https=0
 use_domain_name=0
 
+[registration]
+zzds_school_wlan_ip=
+allow_all_registration_request_under_production_env=0
+
 [gmail]
 discovery_path=/var/openvpn-mgmt/web/gmail/gmail_v1_discovery.json
 token_path=/var/openvpn-mgmt/web/gmail/token.json
