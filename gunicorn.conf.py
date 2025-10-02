@@ -5,4 +5,4 @@ forwarded_allow_ips = "*"
 accesslog = "-"
 access_log_format = '%(t)s %(p)s %(h)s "%(r)s" %(s)s'
 
-errorlog = "-" 
+errorlog = "-"

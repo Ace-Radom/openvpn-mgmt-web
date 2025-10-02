@@ -7,6 +7,8 @@ from flask import (
     request,
 )
 
+from app import config, utils
+
 bp = Blueprint("view", __name__)
 
 
@@ -26,6 +28,13 @@ def login():
 
 @bp.route("/register")
 def register():
+    if config.config["app"]["is_production_env"]:
+        real_ip = request.headers.get("X-Real-IP", "")
+        if not utils.is_request_from_zzds_school_wlan(real_ip):
+            return redirect(
+                url_for("view.error", msg="禁止注册", next_url=url_for("view.login"))
+            )
+    # only registration requests from ZZDS school wlan are allowed under production env
     return render_template("register.html")
 
 
