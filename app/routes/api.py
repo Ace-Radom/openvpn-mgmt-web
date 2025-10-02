@@ -14,18 +14,19 @@ bp = Blueprint("api", __name__)
 @bp.route("/api/register", methods=["POST"])
 def api_register():
     data = request.json
-    username = data.get("username")
+    code = data.get("invitation_code")
     password = data.get("password")
     email = data.get("email")
-    if not username or not password or not email:
+    if not code or not password or not email:
         return (
             jsonify(
-                {"success": False, "msg": "Username, password and email are required"}
+                {"success": False, "msg": "Invitation code, password and email are required"}
             ),
             400,
         )
-    if db.user_exists(username):
-        return jsonify({"success": False, "msg": "User already exists"}), 409
+    if not db.invitation_code_exists(code):
+        return jsonify({"success": False, "msg": "Invitation code doesn't exist"}), 400
+    username = db.get_username_with_invitation_code(code)
     verify_token = db.add_user_not_verified(username, password, email)
     if verify_token is None:
         return jsonify({"success": False, "msg": "DB error"}), 500
@@ -45,6 +46,8 @@ def api_register():
     except:
         return jsonify({"success": False, "msg": "Failed to send verify email"}), 500
 
+    db.pop_invitation_code(code)
+    
     session["allow_success"] = True
     return jsonify({"success": True, "msg": "Registration successful"})
 

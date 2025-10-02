@@ -1,6 +1,10 @@
 import ipaddress
+import random
+import string
 
 from app import config
+
+RANDOM_CHARSET = string.ascii_letters + string.digits
 
 
 def build_server_link(route: str, is_public_link: bool = False) -> str:
@@ -45,3 +49,7 @@ def is_request_from_zzds_school_wlan(remote_ip: str) -> bool:
 
     if remote == config.config["registration"]["zzds_school_wlan_ip"]:
         return True
+
+
+def generate_random_str(length: int) -> str:
+    return "".join(random.choice(RANDOM_CHARSET) for _ in range(length))

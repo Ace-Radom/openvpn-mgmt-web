@@ -1,4 +1,4 @@
-const REGEX_USERNAME = /^[A-Z][a-z]*$/;
+const REGEX_INVITATION_CODE = /^[A-Za-z0-9]{12}$/;
 const REGEX_EMAIL = /^\S+@\S+\.\S+$/;
 const REGEX_PSWD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^\s]{6,}$/;
 
@@ -17,8 +17,8 @@ Promise.all([
     iconLoaded = true;
 });
 
-function validateUsername(username) {
-    return REGEX_USERNAME.test(username);
+function validateInvitationCode(code) {
+    return REGEX_INVITATION_CODE.test(code);
 }
 
 function validateEmail(email) {
@@ -50,8 +50,8 @@ function setIcon(element, valid) {
 
 if (document.getElementById('register-form')) {
 
-    const usernameInput = document.getElementById('username');
-    const usernameIcon = document.getElementById('username_icon');
+    const invitationCodeInput = document.getElementById('invitation_code');
+    const invitationCodeIcon = document.getElementById('invitation_code_icon');
     const emailInput = document.getElementById('email');
     const emailIcon = document.getElementById('email_icon');
     const pswdInput = document.getElementById('password');
@@ -59,12 +59,12 @@ if (document.getElementById('register-form')) {
     const pswd2Input = document.getElementById('password_confirm');
     const pswd2Icon = document.getElementById('password_confirm_icon');
 
-    usernameInput.addEventListener('input', function () {
-        if (!usernameInput.value) {
-            setIcon(usernameIcon, null);
+    invitationCodeInput.addEventListener('input', function () {
+        if (!invitationCodeInput.value) {
+            setIcon(invitationCodeIcon, null);
         }
         else {
-            setIcon(usernameIcon, validateUsername(usernameInput.value));
+            setIcon(invitationCodeIcon, validateInvitationCode(invitationCodeInput.value));
         }
     });
 
@@ -99,14 +99,14 @@ if (document.getElementById('register-form')) {
         e.preventDefault();
         let msg = document.getElementById('msg');
 
-        let username = document.getElementById('username').value;
+        let invitationCode = document.getElementById('invitation_code').value;
         let email = document.getElementById('email').value;
         let pswd = document.getElementById('password').value;
         let pswd2 = document.getElementById('password_confirm').value;
 
-        if (!validateUsername(username)) {
+        if (!validateInvitationCode(invitationCode)) {
             msg.style.color = 'red';
-            msg.innerHTML = '无效用户名。';
+            msg.innerHTML = '无效邀请码';
         } else if (!validateEmail(email)) {
             msg.style.color = 'red';
             msg.innerHTML = '无效邮箱地址。';
@@ -128,7 +128,7 @@ if (document.getElementById('register-form')) {
         let res = await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password: pswd, email })
+            body: JSON.stringify({ invitation_code: invitationCode, password: pswd, email })
         });
         let data = await res.json();
         msg.innerText = data.msg;

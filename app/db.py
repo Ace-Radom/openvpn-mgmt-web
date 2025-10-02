@@ -4,7 +4,7 @@ from hashlib import sha256
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app import config
+from app import config, utils
 
 
 def get_conn():
@@ -40,6 +40,15 @@ def init_db() -> bool:
             );
         """
         )
+        c.execute(
+            """
+            CREATE TABLE IF NOT EXISTS invitation_codes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                invitation_code TEXT UNIQUE NOT NULL,
+                username TEXT UNIQUE NOT NULL
+            );
+        """
+        )
         conn.commit()
         return True
     except:
@@ -54,13 +63,19 @@ def user_exists(username: str) -> bool:
     c = conn.cursor()
     c.execute(
         """
-        SELECT EXISTS(
+        SELECT EXISTS (
             SELECT 1 FROM users WHERE username = ?
             UNION
             SELECT 1 FROM users_not_verified WHERE username = ?
+            UNION
+            SELECT 1 FROM invitation_codes WHERE username = ?
         );
     """,
-        (username, username),
+        (
+            username,
+            username,
+            username,
+        ),
     )
     result = c.fetchone()[0]
     conn.close()
@@ -148,7 +163,7 @@ def verify_user(token: str) -> bool:
         conn.close()
 
 
-def check_user_password(username, password) -> bool:
+def check_user_password(username: str, password: str) -> bool:
     conn = get_conn()
     c = conn.cursor()
     c.execute("SELECT password_hash FROM users WHERE username = ?", (username,))
@@ -157,3 +172,66 @@ def check_user_password(username, password) -> bool:
     if row:
         return check_password_hash(row["password_hash"], password)
     return False
+
+
+def get_username_with_invitation_code(code: str) -> str | None:
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute(
+        "SELECT username FROM invitation_codes WHERE invitation_code = ?", (code,)
+    )
+    row = c.fetchone()
+    if row is None:
+        return None
+    return row["username"]
+
+
+def invitation_code_exists(code: str) -> bool:
+    return get_username_with_invitation_code(code) is not None
+
+
+def generate_invitation_code(username: str) -> str | None:
+    if user_exists(username):
+        return None
+
+    code = utils.generate_random_str(12)
+    while invitation_code_exists(code):
+        code = utils.generate_random_str(12)
+
+    conn = get_conn()
+    c = conn.cursor()
+
+    try:
+        c.execute(
+            "INSERT INTO invitation_codes (invitation_code, username) VALUES (?, ?)",
+            (
+                code,
+                username,
+            ),
+        )
+        conn.commit()
+        return code
+    except:
+        conn.rollback()
+        return None
+    finally:
+        conn.close()
+
+def pop_invitation_code(code: str) -> None:
+    if not invitation_code_exists(code):
+        return
+    
+    conn = get_conn()
+    c = conn.cursor()
+
+    try:
+        c.execute(
+            "DELETE FROM invitation_codes WHERE invitation_code = ?", (code,)
+        )
+        conn.commit()
+        return
+    except:
+        conn.rollback()
+        return
+    finally:
+        conn.close()
