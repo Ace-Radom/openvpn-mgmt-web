@@ -10,7 +10,7 @@ if config.config["app"]["secret_key"] is None:
 
 app = create_app()
 app.secret_key = config.config["app"]["secret_key"]
-app.config.from_object("app.config.flask_config")
+app.config.from_object("app.flask_config")
 if config.config["app"]["is_production_env"]:
     app.config.update(DEBUG=False, SESSION_COOKIE_SECURE=True)
 else:

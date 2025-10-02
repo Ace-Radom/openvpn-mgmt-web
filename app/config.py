@@ -150,8 +150,3 @@ def parse_config(config_path: str):
             and parser["gmail"]["sender_email_addr"].find("@gmail.com") != -1
         ):
             config["gmail"]["sender_email_addr"] = parser["gmail"]["sender_email_addr"]
-
-
-class flask_config:
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Lax"
