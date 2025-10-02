@@ -1,4 +1,7 @@
 import os
+import redis
+
+from flask_session import Session as ServerSideSession
 
 from app import config, create_app, db
 from app.email import gmail
@@ -15,6 +18,15 @@ if config.config["app"]["is_production_env"]:
     app.config.update(DEBUG=False, SESSION_COOKIE_SECURE=True)
 else:
     app.config.update(DEBUG=True)
+
+app.config.update(
+    SESSION_TYPE="redis",
+    SESSION_PERMANENT=False,
+    SESSION_USE_SIGNER=True,
+    SESSION_KEY_PREFIX=config.config["redis"]["key_prefix"],
+    SESSION_REDIS=redis.from_url(config.config["redis"]["db_url"]),
+)
+ServerSideSession(app)
 
 if not db.init_db():
     raise RuntimeError("Init DB failed")

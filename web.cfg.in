@@ -15,6 +15,10 @@ use_domain_name=0
 zzds_school_wlan_ip=
 allow_all_registration_request_under_production_env=0
 
+[redis]
+key_prefix=openvpn-mgmt-web-session:
+db_url=redis://127.0.0.1:6379
+
 [gmail]
 discovery_path=/var/openvpn-mgmt/web/gmail/gmail_v1_discovery.json
 token_path=/var/openvpn-mgmt/web/gmail/token.json

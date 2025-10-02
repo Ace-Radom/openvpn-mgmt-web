@@ -23,10 +23,14 @@ config = {
         "zzds_school_wlan_ip": None,
         "allow_all_registration_request_under_production_env": False,
     },
+    "redis": {
+        "key_prefix": "openvpn-mgmt-web-session:",
+        "db_url": "redis://127.0.0.1:6379",
+    },
     "gmail": {
-        "discovery_path": None,
-        "token_path": None,
-        "secret_path": None,
+        "discovery_path": "/var/openvpn-mgmt/web/gmail/gmail_v1_discovery.json",
+        "token_path": "/var/openvpn-mgmt/web/gmail/token.json",
+        "secret_path": "/var/openvpn-mgmt/web/gmail/secret.json",
         "sender_email_addr": None,
     },
 }
@@ -127,6 +131,15 @@ def parse_config(config_path: str):
                 )
                 != 0
             )
+
+    if parser.has_section("redis"):
+        if (
+            parser.has_option("redis", "key_prefix")
+            and len(parser["redis"]["key_prefix"]) != 0
+        ):
+            config["redis"]["key_prefix"] = parser["redis"]["key_prefix"]
+        if parser.has_option("redis", "db_url") and len(parser["redis"]["db_url"]) != 0:
+            config["redis"]["db_url"] = parser["redis"]["db_url"]
 
     if parser.has_section("gmail"):
         if (
