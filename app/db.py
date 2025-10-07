@@ -82,6 +82,34 @@ def user_exists(username: str) -> bool:
     return bool(result)
 
 
+def admin_exists() -> bool:
+    return user_exists("Admin")
+
+
+def add_admin() -> bool:
+    if admin_exists():
+        return False
+    
+    password_hash = generate_password_hash("123456")
+    
+    conn = get_conn()
+    c = conn.cursor()
+    try:
+        c.execute(
+            """
+            INSERT INTO users VALUES (0, 'Admin', ?, '');
+        """,
+            (password_hash,)
+        )
+        conn.commit()
+        return True
+    except:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+
 def verify_token_exists(token: str) -> bool:
     conn = get_conn()
     c = conn.cursor()

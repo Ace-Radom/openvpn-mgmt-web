@@ -35,5 +35,9 @@ gmail.fetch_gmail_discovery()
 gmail.auth_gmail_api()
 gmail.secure_gmail_related_files()
 
+if not db.admin_exists():
+    if not db.add_admin():
+        raise RuntimeError("Add admin failed")
+
 if __name__ == "__main__":
     app.run()

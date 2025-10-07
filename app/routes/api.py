@@ -64,3 +64,15 @@ def api_login():
     session["username"] = username
     session["allow_success"] = True
     return jsonify({"success": True, "msg": "Login successful"})
+
+
+@bp.route("/api/invite", methods=["POST"])
+def api_invite():
+    data = request.json
+    username = data.get("username")
+    if not username:
+        return jsonify({"success": False, "msg": "Username required"}), 400
+    code = db.generate_invitation_code(username)
+    if code is None:
+        return jsonify({"success": False, "msg": "DB error"}), 500
+    return jsonify({"success": True, "code": code})

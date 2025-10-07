@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>管理界面</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+</head>
+
+<body>
+    <div class="main-card">
+        <div id="user-management">
+            <div class="section-title">用户管理</div>
+            <div class="invite-box">
+                <label for="invite-username">建立邀请码（输入用户名）</label>
+                <input type="text" id="invite-username" placeholder="请输入用户名">
+                <button onclick="generateInvitationCode()">生成邀请码</button>
+            </div>
+        </div>
+        <a href="/logout" style="display:inline-block;margin-top:18px;color:#2073e0;">退出登录</a>
+    </div>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+
+</html>
