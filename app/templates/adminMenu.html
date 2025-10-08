@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel - Admin</title>
+    <link rel="stylesheet" href="../static/main.css">
+</head>
+<body>
+    <div class="all">
+            <header class="banner">
+                <div class="menu">Administration</div>
+            </header>
+            <div class="content">
+                <div class="leftMenu">
+                    <a class="submenuleft" href="main.html">Main</a>
+                    <a class="submenuleft" href="adminMenu.html">Admin</a>
+                    <a class="submenuleft" href="*">Register</a>
+                    <a class="submenuleft" href="*">User</a>
+                </div>
+                <div class="rightContent">
+                    <div class="section-title">用户管理</div>
+                        <div class="invite-box">
+                            <label for="invite-username">建立邀请码（输入用户名）</label>
+                            <input type="text" id="invite-username" placeholder="请输入用户名">
+                            <button onclick="generateInvitationCode()">生成邀请码</button>
+                        </div>
+                </div>
+            </div>
+        <div class="foot"></div>
+    </div>
+</body>
+</html>
