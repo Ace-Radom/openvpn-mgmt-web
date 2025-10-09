@@ -2,21 +2,6 @@ const REGEX_INVITATION_CODE = /^[A-Za-z0-9]{12}$/;
 const REGEX_EMAIL = /^\S+@\S+\.\S+$/;
 const REGEX_PSWD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^\s]{6,}$/;
 
-async function loadSVG(url) {
-    const res = await fetch(url);
-    return await res.text();
-}
-
-let iconCheck = null;
-let iconCross = null;
-let iconLoaded = false;
-Promise.all([
-    loadSVG('/static/icons/check.svg').then(svg => iconCheck = svg),
-    loadSVG('/static/icons/cross.svg').then(svg => iconCross = svg)
-]).then(() => {
-    iconLoaded = true;
-});
-
 function validateInvitationCode(code) {
     return REGEX_INVITATION_CODE.test(code);
 }
@@ -31,21 +16,6 @@ function validatePswd(pswd) {
 
 function validatePswdConfirm(pswd, pswd2) {
     return pswd === pswd2 && REGEX_PSWD.test(pswd);
-}
-
-function setIcon(element, valid) {
-    if (!iconLoaded) {
-        return;
-    }
-
-    if (valid === null) {
-        element.innerHTML = '';
-        element.className = 'input-icon';
-        return;
-    }
-    element.innerHTML = valid ? iconCheck : iconCross;
-    element.className = 'input-icon ' + (valid ? 'valid' : 'invalid');
-    return;
 }
 
 if (document.getElementById('register-form')) {
