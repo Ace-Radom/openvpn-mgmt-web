@@ -1,3 +1,4 @@
+import re
 from flask import (
     Blueprint,
     session,
@@ -20,7 +21,10 @@ def api_register():
     if not code or not password or not email:
         return (
             jsonify(
-                {"success": False, "msg": "Invitation code, password and email are required"}
+                {
+                    "success": False,
+                    "msg": "Invitation code, password and email are required",
+                }
             ),
             400,
         )
@@ -47,7 +51,7 @@ def api_register():
         return jsonify({"success": False, "msg": "Failed to send verify email"}), 500
 
     db.pop_invitation_code(code)
-    
+
     session["allow_success"] = True
     return jsonify({"success": True, "msg": "Registration successful"})
 
@@ -68,11 +72,41 @@ def api_login():
 
 @bp.route("/api/invite", methods=["POST"])
 def api_invite():
+    if not session["username"] or session["username"] != "Admin":
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "msg": "Only admin is allowed to access this endpoint",
+                }
+            ),
+            403,
+        )
+
     data = request.json
     username = data.get("username")
     if not username:
         return jsonify({"success": False, "msg": "Username required"}), 400
+    if not re.match(r"^[A-Z][a-z]*$", username):
+        return jsonify({"success": False, "msg": "Illegal username"}), 400
     code = db.generate_invitation_code(username)
     if code is None:
         return jsonify({"success": False, "msg": "DB error"}), 500
     return jsonify({"success": True, "code": code})
+
+
+@bp.route("/api/list/invites")
+def api_list_invites():
+    if not session["username"] or session["username"] != "Admin":
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "msg": "Only admin is allowed to access this endpoint",
+                }
+            ),
+            403,
+        )
+
+    codes = db.list_invitation_code()
+    return jsonify({"success": True, "codes": codes})

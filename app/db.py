@@ -45,7 +45,9 @@ def init_db() -> bool:
             CREATE TABLE IF NOT EXISTS invitation_codes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 invitation_code TEXT UNIQUE NOT NULL,
-                username TEXT UNIQUE NOT NULL
+                username TEXT UNIQUE NOT NULL,
+                create_time_ts INTEGER NOT NULL,
+                expire_time_ts INTEGER NOT NULL
             );
         """
         )
@@ -89,9 +91,9 @@ def admin_exists() -> bool:
 def add_admin() -> bool:
     if admin_exists():
         return False
-    
+
     password_hash = generate_password_hash("123456")
-    
+
     conn = get_conn()
     c = conn.cursor()
     try:
@@ -99,7 +101,7 @@ def add_admin() -> bool:
             """
             INSERT INTO users VALUES (0, 'Admin', ?, '');
         """,
-            (password_hash,)
+            (password_hash,),
         )
         conn.commit()
         return True
@@ -231,11 +233,8 @@ def generate_invitation_code(username: str) -> str | None:
 
     try:
         c.execute(
-            "INSERT INTO invitation_codes (invitation_code, username) VALUES (?, ?)",
-            (
-                code,
-                username,
-            ),
+            "INSERT INTO invitation_codes (invitation_code, username, create_time_ts, expire_time_ts) VALUES (?, ?, ?, ?);",
+            (code, username, int(datetime.now().timestamp()), -1),
         )
         conn.commit()
         return code
@@ -245,17 +244,24 @@ def generate_invitation_code(username: str) -> str | None:
     finally:
         conn.close()
 
+
+def list_invitation_code() -> list | None:
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute("SELECT * FROM invitation_codes;")
+    rows = [dict(row) for row in c.fetchall()]
+    return rows
+
+
 def pop_invitation_code(code: str) -> None:
     if not invitation_code_exists(code):
         return
-    
+
     conn = get_conn()
     c = conn.cursor()
 
     try:
-        c.execute(
-            "DELETE FROM invitation_codes WHERE invitation_code = ?", (code,)
-        )
+        c.execute("DELETE FROM invitation_codes WHERE invitation_code = ?", (code,))
         conn.commit()
         return
     except:

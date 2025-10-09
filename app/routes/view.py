@@ -52,7 +52,7 @@ def user():
     if "username" not in session:
         return redirect(url_for("view.login"))
     if session["username"] == "Admin":
-        return render_template("adminMenu.html")
+        return render_template("admin.html")
     return render_template("user.html", username=session["username"])
 
 

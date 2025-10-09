@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>管理员后台</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}"> -->
+    <link rel="stylesheet" href="../static/main.css">
 </head>
 
 <body>
@@ -30,6 +31,22 @@
                             <button id="generateInvitationCodeButton">生成邀请码</button>
                         </div>
                     </div>
+                    <div class="sectionContent">
+                        <label>已有邀请码</label>
+                        <table id="invitationCodesTable">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>用户名</th>
+                                    <th>邀请码</th>
+                                    <th>创建时间</th>
+                                    <th>到期时间</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
             <div class="foot"></div>
