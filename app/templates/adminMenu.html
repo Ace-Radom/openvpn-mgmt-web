@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Panel - Admin</title>
-    <link rel="stylesheet" href="../static/main.css">
+    <title>管理员后台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
+
 <body>
-    <div class="all">
+    <div class="main-card">
+        <div class="all" id="adminContainer">
             <header class="banner">
-                <div class="menu">Administration</div>
+                <div class="menu">管理员后台</div>
             </header>
             <div class="content">
                 <div class="leftMenu">
@@ -19,15 +22,20 @@
                     <a class="submenuleft" href="*">User</a>
                 </div>
                 <div class="rightContent">
-                    <div class="section-title">用户管理</div>
-                        <div class="invite-box">
-                            <label for="invite-username">建立邀请码（输入用户名）</label>
-                            <input type="text" id="invite-username" placeholder="请输入用户名">
-                            <button onclick="generateInvitationCode()">生成邀请码</button>
+                    <div class="sectionTitle">用户管理</div>
+                    <div class="sectionContent">
+                        <label>建立邀请码</label>
+                        <div class="inputRow">
+                            <input type="text" id="generateInvitationCodeInput" placeholder="请输入用户名">
+                            <button id="generateInvitationCodeButton">生成邀请码</button>
                         </div>
+                    </div>
                 </div>
             </div>
-        <div class="foot"></div>
+            <div class="foot"></div>
+        </div>
     </div>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
 </body>
+
 </html>
