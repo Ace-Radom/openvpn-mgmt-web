@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员后台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+
+<body>
+    <div class="main-card">
+        <div class="all" id="adminContainer">
+            <header class="banner">
+                <div class="menu">管理员后台</div>
+            </header>
+            <div class="content">
+                <div class="leftMenu">
+                    <a class="submenuleft" href="main.html">Main</a>
+                    <a class="submenuleft" href="adminMenu.html">Admin</a>
+                    <a class="submenuleft" href="*">Register</a>
+                    <a class="submenuleft" href="*">User</a>
+                </div>
+                <div class="rightContent">
+                    <div class="sectionTitle">用户管理</div>
+                    <div class="sectionContent">
+                        <label>建立邀请码</label>
+                        <div class="inputRow">
+                            <input type="text" id="generateInvitationCodeInput" placeholder="请输入用户名">
+                            <button id="generateInvitationCodeButton">生成邀请码</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="foot"></div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+
+</html>
