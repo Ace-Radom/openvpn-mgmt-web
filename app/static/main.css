@@ -92,7 +92,8 @@ body {
 }
 
 .rightContent {
-    padding-top: 40px;
+    margin-top: 24px;
+    margin-right: 24px;
     grid-column: 2 / 6;
 }
 
@@ -173,6 +174,10 @@ button:focus {
     flex-wrap: wrap;
 }
 
+.sectionContent .inputRow p {
+    margin-top: 10px;
+}
+
 .sectionContent .inputRow input[type="text"],
 .sectionContent .inputRow input[type="email"],
 .sectionContent .inputRow input[type="password"] {
@@ -184,6 +189,57 @@ button:focus {
 .sectionContent .inputRow button {
     width: 140px;
     padding: 11px 0;
+}
+
+.sectionContent .numberInput {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    border: 1px solid #dbe7f3;
+    border-radius: 7px;
+    overflow: hidden;
+    background: #f6fafd;
+    box-sizing: border-box;
+}
+
+.sectionContent .numberInput input[type="number"] {
+    width: 40px;
+    padding: 8px;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-size: 1rem;
+    background: #f6fafd;
+}
+
+.sectionContent .numberInput input[type="number"]::-webkit-outer-spin-button,
+.sectionContent .numberInput input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.sectionContent .numberInput input[type="number"]:focus {
+    box-shadow: 0 0 0 2px #2073e03a inset;
+    background: #fff;
+}
+
+.sectionContent .numberInput button {
+    width: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #003b70;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sectionContent .numberInput button:hover {
+    background: #d5e5f1;
+}
+
+.sectionContent .numberInput button:active {
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .sectionContent table {

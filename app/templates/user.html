@@ -4,16 +4,56 @@
 <head>
     <meta charset="UTF-8">
     <title>User Center</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='simplified.css') }}">
+    <link rel="stylesheet" href="../static/main.css">
     <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
 </head>
 
 <body>
     <div class="main-card">
-        <h2>欢迎，{{ username }}！</h2>
-        <p>这是您的用户中心页面，仅登录后可见。</p>
-        <a href="/logout" style="display:inline-block;margin-top:18px;color:#2073e0;">退出登录</a>
+        <div class="all" id="userContainer">
+            <header class="banner"></header>
+            <div class="content">
+                <div class="leftMenu">
+                    <a class="submenuleft" href="#">服务器</a>
+                    <a class="submenuleft" href="#">用户设置</a>
+                </div>
+                <div class="rightContent">
+                    <div class="sectionTitle">服务器 Profile</div>
+                    <div class="sectionContent">
+                        <label>Profile 申请</label>
+                        <div class="inputRow">
+                            <p>数量：</p>
+                            <div class="numberInput">
+                                <button type="button" class="decrement">-</button>
+                                <input type="number" id="quantity" value="1" min="1" max="5">
+                                <button type="button" class="increment">+</button>
+                            </div>
+                            <button id="requestProfileButton">发送请求</button>
+                        </div>
+                    </div>
+                    <div class="sectionContent">
+                        <label>Profile 状态</label>
+                        <table id="profileStatusTable">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>目标服务器</th>
+                                    <th>CN</th>
+                                    <th>申请时间</th>
+                                    <th>状态</th>
+                                    <th>备注</th>
+                                    <th>下载</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="foot"></div>
+        </div>
+        <!-- <a href="/logout" style="display:inline-block;margin-top:18px;color:#2073e0;">退出登录</a> -->
     </div>
+    <script src="../static/utils.js"></script>
 </body>
 
 </html>
