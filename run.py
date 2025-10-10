@@ -3,7 +3,7 @@ import redis
 
 from flask_session import Session as ServerSideSession
 
-from app import config, create_app, db
+from app import config, create_app, db, redis_helper
 from app.email import gmail
 
 base_dir = os.path.split(os.path.realpath(__file__))[0]
@@ -34,6 +34,8 @@ if not db.init_db():
 gmail.fetch_gmail_discovery()
 gmail.auth_gmail_api()
 gmail.secure_gmail_related_files()
+
+redis_helper.init()
 
 if not db.admin_exists():
     if not db.add_admin():
