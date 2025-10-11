@@ -1,9 +1,10 @@
 import os
 import redis
+import urllib3
 
 from flask_session import Session as ServerSideSession
 
-from app import config, create_app, db
+from app import config, create_app, db, vpn_servers
 from app.email import gmail
 from app.helpers import redis_helper
 
@@ -19,6 +20,7 @@ if config.config["app"]["is_production_env"]:
     app.config.update(DEBUG=False, SESSION_COOKIE_SECURE=True)
 else:
     app.config.update(DEBUG=True)
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app.config.update(
     SESSION_TYPE="redis",
@@ -37,6 +39,7 @@ gmail.auth_gmail_api()
 gmail.secure_gmail_related_files()
 
 redis_helper.init()
+vpn_servers.init()
 
 if not db.admin_exists():
     if not db.add_admin():

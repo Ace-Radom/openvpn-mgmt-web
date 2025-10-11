@@ -213,6 +213,14 @@ def parse_config(config_path: str):
                 config["vpn_server_data"][cn]["profile_cache_expire_after"] = int(
                     parser[section_name]["profile_cache_expire_after"]
                 )
+            if (
+                parser.has_option(section_name, "enable_crt_verify")
+                and len(parser[section_name]["enable_crt_verify"])
+                and parser[section_name]["enable_crt_verify"].isdigit()
+            ):
+                config["vpn_server_data"][cn]["enable_crt_verify"] = (
+                    int(parser[section_name]["enable_crt_verify"]) != 0
+                )
 
     if parser.has_section("redis"):
         if (

@@ -27,6 +27,7 @@ usage_refresh_interval=5
 enable_profile_cache=1
 profile_cache_refresh_interval=3600  # 1h
 profile_cache_expire_after=18000     # 5h
+enable_crt_verify=1
 
 # ...
 
