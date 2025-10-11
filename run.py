@@ -3,8 +3,9 @@ import redis
 
 from flask_session import Session as ServerSideSession
 
-from app import config, create_app, db, redis_helper
+from app import config, create_app, db
 from app.email import gmail
+from app.helpers import redis_helper
 
 base_dir = os.path.split(os.path.realpath(__file__))[0]
 config.parse_config(os.path.join(base_dir, "web.cfg"))
