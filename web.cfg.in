@@ -15,8 +15,24 @@ use_domain_name=0
 zzds_school_wlan_ip=
 allow_all_registration_request_under_production_env=0
 
+[vpn_server]
+server_cn={list:server_common_names}
+
+[vpn_server:{str:server_common_name}]
+ip=
+port=9531
+use_https=1
+enable_usage=1
+usage_refresh_interval=5
+enable_profile_cache=1
+profile_cache_refresh_interval=3600  # 1h
+profile_cache_expire_after=18000     # 5h
+
+# ...
+
 [redis]
-key_prefix=openvpn-mgmt-web-session:
+profile_key_prefix=openvpn-mgmt-web-profile:
+session_key_prefix=openvpn-mgmt-web-session:
 db_url=redis://127.0.0.1:6379
 
 [gmail]

@@ -23,7 +23,7 @@ app.config.update(
     SESSION_TYPE="redis",
     SESSION_PERMANENT=False,
     SESSION_USE_SIGNER=True,
-    SESSION_KEY_PREFIX=config.config["redis"]["key_prefix"],
+    SESSION_KEY_PREFIX=config.config["redis"]["session_key_prefix"],
     SESSION_REDIS=redis.from_url(config.config["redis"]["db_url"]),
 )
 ServerSideSession(app)

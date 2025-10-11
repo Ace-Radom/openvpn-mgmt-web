@@ -23,8 +23,11 @@ config = {
         "zzds_school_wlan_ip": None,
         "allow_all_registration_request_under_production_env": False,
     },
+    "vpn_server": {"server_cn": []},  # common names
+    "vpn_server_data": {},  # cn as key
     "redis": {
-        "key_prefix": "openvpn-mgmt-web-session:",
+        "profile_key_prefix": "openvpn-mgmt-web-profile:",
+        "session_key_prefix": "openvpn-mgmt-web-session:",
         "db_url": "redis://127.0.0.1:6379",
     },
     "gmail": {
@@ -132,12 +135,93 @@ def parse_config(config_path: str):
                 != 0
             )
 
+    if parser.has_section("vpn_server"):
+        if (
+            parser.has_option("vpn_server", "server_cn")
+            and len(parser["vpn_server"]["server_cn"]) != 0
+        ):
+            if parser["vpn_server"]["server_cn"].find(",") == -1:
+                config["vpn_server"]["server_cn"] = [parser["vpn_server"]["server_cn"]]
+            else:
+                cns = parser["vpn_server"]["server_cn"].split(",")
+                for cn in cns:
+                    config["vpn_server"]["server_cn"].append(cn.strip())
+
+    for cn in config["vpn_server"]["server_cn"]:
+        section_name = f"vpn_server:{ cn }"
+        if parser.has_section(section_name):
+            config["vpn_server_data"][cn] = {}
+            if (
+                parser.has_option(section_name, "ip")
+                and len(parser[section_name]["ip"]) != 0
+                and is_valid_ipv4(parser[section_name]["ip"])
+            ):
+                config["vpn_server_data"][cn]["ip"] = parser[section_name]["ip"]
+            if (
+                parser.has_option(section_name, "port")
+                and len(parser[section_name]["port"]) != 0
+                and parser[section_name]["port"].isdigit()
+            ):
+                config["vpn_server_data"][cn]["port"] = int(
+                    parser[section_name]["port"]
+                )
+            if (
+                parser.has_option(section_name, "use_https")
+                and len(parser[section_name]["use_https"]) != 0
+                and parser[section_name]["use_https"].isdigit()
+            ):
+                config["vpn_server_data"][cn]["use_https"] = (
+                    int(parser[section_name]["use_https"]) != 0
+                )
+            if (
+                parser.has_option(section_name, "enable_usage")
+                and len(parser[section_name]["enable_usage"]) != 0
+                and parser[section_name]["enable_usage"].isdigit()
+            ):
+                config["vpn_server_data"][cn]["enable_usage"] = (
+                    int(parser[section_name]["enable_usage"]) != 0
+                )
+            if (
+                parser.has_option(section_name, "usage_refresh_interval")
+                and len(parser[section_name]["usage_refresh_interval"]) != 0
+                and parser[section_name]["usage_refresh_interval"].isdigit()
+            ):
+                config["vpn_server_data"][cn]["usage_refresh_interval"] = int(
+                    parser[section_name]["usage_refresh_interval"]
+                )
+            if (
+                parser.has_option(section_name, "enable_profile_cache")
+                and len(parser[section_name]["enable_profile_cache"])
+                and parser[section_name]["enable_profile_cache"].isdigit()
+            ):
+                config["vpn_server_data"][cn]["enable_profile_cache"] = (
+                    int(parser[section_name]["enable_profile_cache"]) != 0
+                )
+            if (
+                parser.has_option(section_name, "profile_cache_refresh_interval")
+                and len(parser[section_name]["profile_cache_refresh_interval"]) != 0
+                and parser[section_name]["profile_cache_refresh_interval"].isdigit()
+            ):
+                config["vpn_server_data"][cn]["profile_cache_refresh_interval"] = int(
+                    parser[section_name]["profile_cache_refresh_interval"]
+                )
+            if (
+                parser.has_option(section_name, "profile_cache_expire_after")
+                and len(parser[section_name]["profile_cache_expire_after"])
+                and parser[section_name]["profile_cache_expire_after"].isdigit()
+            ):
+                config["vpn_server_data"][cn]["profile_cache_expire_after"] = int(
+                    parser[section_name]["profile_cache_expire_after"]
+                )
+
     if parser.has_section("redis"):
         if (
-            parser.has_option("redis", "key_prefix")
-            and len(parser["redis"]["key_prefix"]) != 0
+            parser.has_option("redis", "session_key_prefix")
+            and len(parser["redis"]["session_key_prefix"]) != 0
         ):
-            config["redis"]["key_prefix"] = parser["redis"]["key_prefix"]
+            config["redis"]["session_key_prefix"] = parser["redis"][
+                "session_key_prefix"
+            ]
         if parser.has_option("redis", "db_url") and len(parser["redis"]["db_url"]) != 0:
             config["redis"]["db_url"] = parser["redis"]["db_url"]
 
