@@ -1,5 +1,5 @@
 from app import config
-from app.helpers import redis_helper, requests_helper
+from app.helpers import requests_helper
 
 
 class vpn_server:
@@ -92,6 +92,14 @@ class vpn_server:
         )
         return status_code == 200
 
+    # TODO: download hash check
+
+    def check_profile_cache_enabled(self) -> bool:
+        return self._enable_profile_cache
+
+    def get_profile_cache_expire_after(self) -> int:
+        return self._profile_cache_expire_after
+
 
 vpn_servers: dict[str, vpn_server] = {}
 
@@ -110,3 +118,11 @@ def init():
             config.config["vpn_server_data"][cn]["profile_cache_expire_after"],
             config.config["vpn_server_data"][cn]["enable_crt_verify"],
         )
+
+
+def exists(server_cn: str):
+    return server_cn in vpn_servers.keys()
+
+
+def list_servers() -> list:
+    return vpn_servers.keys()

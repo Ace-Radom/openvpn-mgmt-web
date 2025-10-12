@@ -2,6 +2,8 @@
 secret_key=
 is_production_env=0
 db_path=/var/openvpn-mgmt/web/users.db
+profiles_cache_dir=/var/openvpn-mgmt/web/cached_profiles/
+temp_dir=/tmp/openvpn-mgmt/web/
 
 [server]
 public_ip=

@@ -8,6 +8,8 @@ config = {
         "secret_key": None,
         "is_production_env": False,
         "db_path": "/var/openvpn-mgmt/web/users.db",
+        "profiles_cache_dir": "/var/openvpn-mgmt/web/cached_profiles/",
+        "temp_dir": "/tmp/openvpn-mgmt/web/",
     },
     "server": {
         "public_ip": None,
@@ -59,6 +61,13 @@ def parse_config(config_path: str):
             )
         if parser.has_option("app", "db_path") and len(parser["app"]["db_path"]) != 0:
             config["app"]["db_path"] = parser["app"]["db_path"]
+        if (
+            parser.has_option("app", "profiles_cache_dir")
+            and len(parser["app"]["profiles_cache_dir"]) != 0
+        ):
+            config["app"]["profiles_cache_dir"] = parser["app"]["profiles_cache_dir"]
+        if parser.has_option("app", "temp_dir") and len(parser["app"]["temp_dir"]) != 0:
+            config["app"]["temp_dir"] = parser["app"]["temp_dir"]
 
     if parser.has_section("server"):
         if (

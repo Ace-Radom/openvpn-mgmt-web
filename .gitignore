@@ -211,3 +211,4 @@ web.cfg
 *.db
 *.json
 *.code-workspace
+cached_profiles/

@@ -4,7 +4,7 @@ import urllib3
 
 from flask_session import Session as ServerSideSession
 
-from app import config, create_app, db, vpn_servers
+from app import config, create_app, db, profiles, vpn_servers, utils
 from app.email import gmail
 from app.helpers import redis_helper
 
@@ -12,6 +12,8 @@ base_dir = os.path.split(os.path.realpath(__file__))[0]
 config.parse_config(os.path.join(base_dir, "web.cfg"))
 if config.config["app"]["secret_key"] is None:
     raise RuntimeError("Secret key cannot be None")
+
+utils.create_temp_dir_if_not_exists()
 
 app = create_app()
 app.secret_key = config.config["app"]["secret_key"]
@@ -40,6 +42,8 @@ gmail.secure_gmail_related_files()
 
 redis_helper.init()
 vpn_servers.init()
+
+profiles.sync_profile_cache("debug")
 
 if not db.admin_exists():
     if not db.add_admin():
