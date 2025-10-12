@@ -44,7 +44,7 @@ class vpn_server:
             data=data,
             crt_verify=self._enable_crt_verify,
         )
-    
+
     def _download(self, endpoint: str, download_to: str) -> tuple[int, dict]:
         return requests_helper.download(
             self._ip,
@@ -58,35 +58,38 @@ class vpn_server:
     def check_alive(self) -> bool:
         status_code, _ = self._get("/alive")
         return status_code == 200
-    
+
     def get_profile_index(self) -> dict | None:
         status_code, data = self._get("/profiles/index")
         if status_code != 200:
             return None
-        
+
         return data["data"]
-    
+
     def get_max_profiles_per_user(self) -> int | None:
         status_code, data = self._get("/profiles/maxperusr")
         if status_code != 200:
             return None
-        
+
         return data["data"]["max_per_user"]
-    
+
     def check_profile_exists(self, common_name: str) -> bool | None:
         status_code, data = self._post("/profiles/exist", {"common_name": common_name})
         if status_code != 200:
             return None
-        
+
         return data["data"]["exist"]
-    
+
     def add_profile(self, username: str, common_name: str) -> bool:
-        status_code, _ = self._post("/profiles/add", {"username": username, "common_name": common_name})
+        status_code, _ = self._post(
+            "/profiles/add", {"username": username, "common_name": common_name}
+        )
         return status_code == 200
-    
 
     def download_profile(self, common_name: str, download_to: str) -> bool:
-        status_code, _ = self._download(f"/profiles/download/{ common_name }", download_to)
+        status_code, _ = self._download(
+            f"/profiles/download/{ common_name }", download_to
+        )
         return status_code == 200
 
 
