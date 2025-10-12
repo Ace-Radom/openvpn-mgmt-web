@@ -25,7 +25,9 @@ def init_db() -> bool:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
-                email TEXT NOT NULL
+                email TEXT NOT NULL,
+                verified_time_ts INTEGER NOT NULL,
+                group_num INTEGER NOT NULL
             );
         """
         )
@@ -99,7 +101,7 @@ def add_admin() -> bool:
     try:
         c.execute(
             """
-            INSERT INTO users VALUES (0, 'Admin', ?, '');
+            INSERT INTO users VALUES (0, 'Admin', ?, '', 0, 0);
         """,
             (password_hash,),
         )
@@ -178,10 +180,14 @@ def verify_user(token: str) -> bool:
         c.execute("BEGIN TRANSACTION;")
         c.execute(
             """
-            INSERT INTO users (username, password_hash, email)
-                SELECT username, password_hash, email FROM users_not_verified WHERE verify_token = ?;
+            INSERT INTO users (username, password_hash, email, verified_time_ts, group_num)
+                SELECT username, password_hash, email, ?, 1
+                FROM users_not_verified WHERE verify_token = ?;
         """,
-            (token,),
+            (
+                int(datetime.now().timestamp()),
+                token,
+            ),
         )
         c.execute("DELETE FROM users_not_verified WHERE verify_token = ?;", (token,))
         conn.commit()
