@@ -4,7 +4,7 @@ import os
 import re
 import shutil
 
-from app import config, utils
+from app import config, db, utils
 from app import vpn_servers as servers
 from app.helpers import redis_helper
 from app.vpn_servers import vpn_servers
@@ -170,7 +170,7 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
     request some profiles
 
     if allowed, return a list of new profiles' cn;
-    if more profiles than `max_profiles_per_user` are requested, returns `None`
+    if more profiles than `max_profiles_per_user` are requested, returns an empty list
 
     this is not same as add_profile(): it only request names, waiting for admin to confirm
     """
@@ -187,9 +187,16 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
         filename for filename in profile_filenames if filename.startswith(username)
     ]
 
-    if len(user_profile_filenames) + num > max_profiles_per_user:
+    user_profiles_requests_now = db.count_user_profile_requests(username, server_cn)
+    if user_profiles_requests_now == -1:
         return None
-    # more profiles than max_profiles_per_user, deny
+
+    if (
+        len(user_profile_filenames) + user_profiles_requests_now + num
+        > max_profiles_per_user
+    ):
+        return []
+    # more profiles than max_profiles_per_user, deny & return an empty list
 
     max_profile_index = -1
     for filename in user_profile_filenames:
@@ -206,5 +213,9 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
     new_cns = []
     for i in range(max_profile_index + 1, max_profile_index + 1 + num):
         new_cns.append(f"{ username }-{ i }")
+
+    if not db.add_profile_requests(username, server_cn, new_cns):
+        return None
+    # add to db failed
 
     return new_cns

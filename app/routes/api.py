@@ -1,3 +1,4 @@
+import datetime
 import re
 from flask import (
     Blueprint,
@@ -6,7 +7,7 @@ from flask import (
     request,
 )
 
-from app import db, utils
+from app import db, profiles, utils, vpn_servers
 from app.email import gmail
 
 bp = Blueprint("api", __name__)
@@ -72,7 +73,9 @@ def api_login():
 
 @bp.route("/api/invite", methods=["POST"])
 def api_invite():
-    if not session["username"] or session["username"] != "Admin":
+    if not session["username"]:
+        return jsonify({"success": False, "msg": "User unauthorized"}), 401
+    elif session["username"] != "Admin":
         return (
             jsonify(
                 {
@@ -95,9 +98,55 @@ def api_invite():
     return jsonify({"success": True, "code": code})
 
 
+@bp.route("/api/reqprofile", methods=["POST"])
+def api_reqprofile():
+    username = session["username"]
+
+    if not username:
+        return jsonify({"success": False, "msg": "User unauthorized"}), 401
+    elif username == "Admin":
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "msg": "Admin is not allowed to access this endpoint",
+                }
+            ),
+            403,
+        )
+
+    data = request.json
+    server_cn = data.get("server_common_name")
+    profile_num = data.get("num")
+    if not server_cn or not profile_num:
+        return (
+            jsonify(
+                {"success": False, "msg": "Server common_name and profile num required"}
+            ),
+            400,
+        )
+    if not vpn_servers.exists(server_cn):
+        return (
+            jsonify(
+                {"success": False, "msg": "Server common_name given doesn't exist"}
+            ),
+            400,
+        )
+
+    new_cns = profiles.request_profiles(server_cn, username, profile_num)
+    if new_cns is None:
+        return jsonify({"success": False, "msg": "Failed to request profiles"}), 500
+    elif len(new_cns) == 0:
+        return jsonify({"success": False, "msg": "Too many profiles"}), 403
+
+    return jsonify({"success": True, "common_names": new_cns})
+
+
 @bp.route("/api/list/invites")
 def api_list_invites():
-    if not session["username"] or session["username"] != "Admin":
+    if not session["username"]:
+        return jsonify({"success": False, "msg": "User unauthorized"}), 401
+    elif session["username"] != "Admin":
         return (
             jsonify(
                 {
@@ -110,3 +159,36 @@ def api_list_invites():
 
     codes = db.list_invitation_code()
     return jsonify({"success": True, "codes": codes})
+
+
+@bp.route("/api/list/profilereqs")
+def api_list_profilereqs():
+    username = session["username"]
+
+    if not username:
+        return jsonify({"success": False, "msg": "User unauthorized"}), 401
+    elif username == "Admin":
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "msg": "Admin is not allowed to access this endpoint",
+                }
+            ),
+            403,
+        )
+
+    requests_data = db.list_user_profile_requests(username)
+    if requests_data is None:
+        return jsonify({"success": False, "msg": "DB error"}), 500
+    # this should never happen: if username is not found in users table, sth is wrong with the db
+
+    requests = [
+        {
+            k: data[k]
+            for k in ["server_common_name", "common_name", "request_time_ts"]
+            if k in data.keys()
+        }
+        for data in requests_data
+    ]
+    return jsonify({"success": True, "requests": requests})

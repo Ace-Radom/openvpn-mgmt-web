@@ -19,6 +19,7 @@ def init_db() -> bool:
 
     try:
         c.execute("BEGIN TRANSACTION;")
+        c.execute("PRAGMA foreign_keys = ON;")
         c.execute(
             """
             CREATE TABLE IF NOT EXISTS users (
@@ -50,6 +51,18 @@ def init_db() -> bool:
                 username TEXT UNIQUE NOT NULL,
                 create_time_ts INTEGER NOT NULL,
                 expire_time_ts INTEGER NOT NULL
+            );
+        """
+        )
+        c.execute(
+            """
+            CREATE TABLE IF NOT EXISTS profile_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                uid INTEGER NOT NULL,
+                server_common_name TEXT NOT NULL,
+                common_name TEXT NOT NULL,
+                request_time_ts INTEGER NOT NULL,
+                FOREIGN KEY(uid) REFERENCES users(id)
             );
         """
         )
@@ -119,6 +132,7 @@ def verify_token_exists(token: str) -> bool:
     c = conn.cursor()
     c.execute("SELECT 1 FROM users_not_verified WHERE verify_token = ?", (token,))
     result = c.fetchone()
+    conn.close()
     return result is not None
 
 
@@ -210,6 +224,20 @@ def check_user_password(username: str, password: str) -> bool:
     return False
 
 
+def get_uid_with_username(username: str) -> int:
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute("SELECT id FROM users WHERE username = ?", (username,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        try:
+            return int(row["id"])
+        except:
+            return -1
+    return -1
+
+
 def get_username_with_invitation_code(code: str) -> str | None:
     conn = get_conn()
     c = conn.cursor()
@@ -217,6 +245,7 @@ def get_username_with_invitation_code(code: str) -> str | None:
         "SELECT username FROM invitation_codes WHERE invitation_code = ?", (code,)
     )
     row = c.fetchone()
+    conn.close()
     if row is None:
         return None
     return row["username"]
@@ -256,6 +285,7 @@ def list_invitation_code() -> list | None:
     c = conn.cursor()
     c.execute("SELECT * FROM invitation_codes;")
     rows = [dict(row) for row in c.fetchall()]
+    conn.close()
     return rows
 
 
@@ -275,3 +305,68 @@ def pop_invitation_code(code: str) -> None:
         return
     finally:
         conn.close()
+
+
+def add_profile_requests(
+    username: str, server_cn: str, common_names: list[str]
+) -> bool:
+    uid = get_uid_with_username(username)
+    if uid == -1:
+        return False
+
+    conn = get_conn()
+    c = conn.cursor()
+
+    try:
+        for cn in common_names:
+            c.execute(
+                "INSERT INTO profile_requests (uid, server_common_name, common_name, request_time_ts) VALUES (?, ?, ?, ?);",
+                (
+                    uid,
+                    server_cn,
+                    cn,
+                    int(datetime.now().timestamp()),
+                ),
+            )
+        conn.commit()
+        return True
+    except:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+
+def count_user_profile_requests(username: str, server_cn: str = "") -> int:
+    uid = get_uid_with_username(username)
+    if uid == -1:
+        return -1
+
+    conn = get_conn()
+    c = conn.cursor()
+    if server_cn == "":
+        c.execute("SELECT COUNT(*) FROM profile_requests WHERE uid = ?;", (uid,))
+    else:
+        c.execute(
+            "SELECT COUNT(*) FROM profile_requests WHERE uid = ? AND server_common_name = ?;",
+            (
+                uid,
+                server_cn,
+            ),
+        )
+    count = c.fetchone()[0]
+
+    return count
+
+
+def list_user_profile_requests(username: str) -> list | None:
+    uid = get_uid_with_username(username)
+    if uid == -1:
+        return None
+
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute("SELECT * FROM profile_requests WHERE uid = ?;", (uid,))
+    rows = [dict(row) for row in c.fetchall()]
+    conn.close()
+    return rows

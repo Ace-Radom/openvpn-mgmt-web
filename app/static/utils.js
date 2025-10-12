@@ -27,3 +27,26 @@ document.querySelectorAll('.numberInput').forEach(container => {
         input.dispatchEvent(new Event('change'));
     });
 });
+
+
+// ts -> str convert
+const DATE_FORMATTER = new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+});
+
+function convertTimestampToString(ts, is_sec) {
+    if (ts === -1) {
+        return '2199/12/31 23:59:59';
+    }
+
+    if (is_sec) {
+        ts *= 1000;
+    }
+    const date = new Date(ts);
+    return DATE_FORMATTER.format(date);
+}
