@@ -319,6 +319,7 @@ def add_profile_requests(
     c = conn.cursor()
 
     try:
+        c.execute("BEGIN TRANSACTION;")
         for cn in common_names:
             c.execute(
                 """
@@ -398,3 +399,51 @@ def list_all_profile_requests() -> list | None:
     rows = [dict(row) for row in c.fetchall()]
     conn.close()
     return rows
+
+def profile_request_exists(server_cn: str, common_name: str) -> bool:
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute("SELECT 1 FROM profile_requests WHERE server_common_name = ? AND common_name = ?;", (server_cn, common_name,))
+    result = c.fetchone()
+    conn.close()
+    return result is not None
+
+def delete_profile_request(server_cn: str, common_name: str) -> bool:
+    if not profile_request_exists(server_cn, common_name):
+        return False
+    
+    conn = get_conn()
+    c = conn.cursor()
+
+    try:
+        c.execute("DELETE FROM profile_requests WHERE server_common_name = ? AND common_name = ?;", (server_cn, common_name,))
+        conn.commit()
+        return True
+    except:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+def reject_profile_request(server_cn: str, common_name: str) -> bool:
+    if not profile_request_exists(server_cn, common_name):
+        return False
+    
+    conn = get_conn()
+    c = conn.cursor()
+
+    try:
+        c.execute(
+            """
+            UPDATE profile_requests
+            SET is_rejected = TRUE
+            WHERE server_common_name = ? AND common_name = ?;
+        """,
+            (server_cn, common_name,))
+        conn.commit()
+        return True
+    except:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()

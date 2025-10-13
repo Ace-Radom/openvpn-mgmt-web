@@ -244,3 +244,29 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
     # add to db failed
 
     return new_cns
+
+
+def approve_profile_request(server_cn: str, common_name: str) -> bool:
+    if not servers.exists(server_cn):
+        return False
+    if not db.profile_request_exists(server_cn, common_name):
+        return False
+    if check_cn_exists(server_cn, common_name) or check_profile_exists(server_cn, common_name):
+        return False
+    
+    if not vpn_servers[server_cn].add_profile(common_name.split("-")[0], common_name):
+        return False
+    if not sync_profile_cache(server_cn):
+        return False
+    if not db.delete_profile_request(server_cn, common_name):
+        return False
+    
+    return True
+
+def reject_profile_request(server_cn: str, common_name: str) -> bool:
+    if not servers.exists(server_cn):
+        return False
+    if not db.profile_request_exists(server_cn, common_name):
+        return False
+    
+    return db.reject_profile_request(server_cn, common_name)

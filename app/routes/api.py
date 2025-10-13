@@ -187,6 +187,7 @@ def api_list_profiles():
     for server_cn in server_cns:
         cns = profiles.list_user_profile_common_names(server_cn, username)
         if cns is None:
+            continue
             return (
                 jsonify(
                     {"success": False, "msg": "Failed to get profile common names"}
@@ -227,3 +228,47 @@ def api_list_profilereqs():
         for data in requests_data
     ]
     return jsonify({"success": True, "requests": requests})
+
+
+@bp.route("/api/operate/profilereq", methods=["POST"])
+def api_operate_profilereq():
+    if not session["username"]:
+        return jsonify({"success": False, "msg": "User unauthorized"}), 401
+    elif session["username"] != "Admin":
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "msg": "Only admin is allowed to access this endpoint",
+                }
+            ),
+            403,
+        )
+    
+    data = request.json
+    server_cn = data.get("server_common_name")
+    cn = data.get("common_name")
+    op = data.get("operation")
+    if not server_cn or not cn or not op:
+        return jsonify({"success": False, "msg": "Server Common_name, common_name and operation required"}), 400
+    if op not in ["approve", "reject"]:
+        return jsonify({"success": False, "msg": "Illegal operation"}), 400
+    if not vpn_servers.exists(server_cn):
+        return (
+            jsonify(
+                {"success": False, "msg": "Server common_name given doesn't exist"}
+            ),
+            400,
+        )
+    if not db.profile_request_exists(server_cn, cn):
+        return jsonify({"success": False, "msg": "Profile request doesn't exist"}), 400
+    
+    if op == "approve":
+        if not profiles.approve_profile_request(server_cn, cn):
+            return jsonify({"success": False, "msg": "Failed to confirm profile request"}), 500
+    elif op == "reject":
+        if not profiles.reject_profile_request(server_cn, cn):
+            return jsonify({"success": False, "msg": "Failed to reject profile request"}), 500
+
+    return jsonify({"success": True})    
+    

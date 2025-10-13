@@ -108,7 +108,7 @@ async function refreshProfileRequestsTable(tbody) {
                 const requestTimeCell = document.createElement('td');
                 requestTimeCell.textContent = convertTimestampToString(request.request_time_ts, true);
                 const statusCell = document.createElement('td');
-                if (data.is_rejected) {
+                if (request.is_rejected) {
                     statusCell.textContent = '审核未通过';
                 }
                 else {

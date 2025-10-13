@@ -4,6 +4,39 @@ function validateUsername(username) {
     return REGEX_USERNAME.test(username);
 }
 
+async function operateProfileRequest(serverCn, cn, op) {
+    try {
+        let res = await fetch('/api/operate/profilereq', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "server_common_name": serverCn,
+                "common_name": cn,
+                "operation": op
+            })
+        });
+        let data = await res.json();
+        if (data.success) {
+            alert('操作成功');
+        }
+        else {
+            alert('操作失败：' + data.msg);
+        }
+    } catch (err) {
+        alert('请求失败：' + err.message);
+    }
+}
+
+async function approveProfileRequest(serverCn, cn) {
+    await operateProfileRequest(serverCn, cn, "approve");
+}
+
+async function rejectProfileRequest(serverCn, cn) {
+    await operateProfileRequest(serverCn, cn, "reject");
+}
+
 async function generateInvitationCode(username) {
     try {
         let res = await fetch('/api/invite', {
@@ -92,7 +125,24 @@ async function refreshProfileRequestsComfirmTable(tbody) {
                 const requestTimeCell = document.createElement('td');
                 requestTimeCell.textContent = convertTimestampToString(request.request_time_ts, true);
                 const operateCell = document.createElement('td');
-                operateCell.textContent = '通过 驳回';
+                const approveLink = document.createElement('a');
+                approveLink.href = '#';
+                approveLink.textContent = '通过';
+                approveLink.style.marginRight = '8px';
+                approveLink.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await approveProfileRequest(request.server_common_name, request.common_name);
+                });
+                const rejectLink = document.createElement('a');
+                rejectLink.href = '#';
+                rejectLink.textContent = '驳回';
+                rejectLink.style.marginRight = '8px';
+                rejectLink.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await rejectProfileRequest(request.server_common_name, request.common_name);
+                });
+                operateCell.appendChild(approveLink);
+                operateCell.appendChild(rejectLink);
 
                 row.appendChild(idCell);
                 row.appendChild(targetServerCell);
