@@ -165,6 +165,27 @@ def check_profile_exists(server_cn: str, common_name: str) -> bool | None:
     return vpn_servers[server_cn].check_profile_exists(common_name)
 
 
+def list_user_profile_common_names(server_cn: str, username: str) -> list | None:
+    """
+    list all profiles' common name from given user
+    """
+    if not servers.exists(server_cn):
+        return None
+    
+    index = get_profile_index(server_cn)
+    if index is None:
+        return None
+    
+    profile_filenames = [data["filename"] for data in index["profiles"]]
+    user_profile_filenames = [
+        filename for filename in profile_filenames if filename.startswith(username)
+    ]
+    cns = [
+        os.path.splitext(filename)[0] for filename in user_profile_filenames
+    ]
+    return cns
+
+
 def request_profiles(server_cn: str, username: str, num: int) -> list | None:
     """
     request some profiles
@@ -177,54 +198,45 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
     if not servers.exists(server_cn):
         return None
 
-    index = get_profile_index(server_cn)
     max_profiles_per_user = get_max_profiles_per_user(server_cn)
-    if index is None or max_profiles_per_user is None:
+    if max_profiles_per_user is None:
         return None
 
-    profile_filenames = [data["filename"] for data in index["profiles"]]
-    user_profile_filenames = [
-        filename for filename in profile_filenames if filename.startswith(username)
-    ]
+    user_profile_cns = list_user_profile_common_names(server_cn, username)
+    if user_profile_cns is None:
+        return None
 
     user_profile_requests_now = db.count_user_profile_requests(username, server_cn)
     if user_profile_requests_now == -1:
         return None
 
     if (
-        len(user_profile_filenames) + user_profile_requests_now + num
+        len(user_profile_cns) + user_profile_requests_now + num
         > max_profiles_per_user
     ):
         return []
     # more profiles than max_profiles_per_user, deny & return an empty list
 
+    if user_profile_requests_now != 0:
+        user_profile_requests = db.list_user_profile_requests(username)
+        if user_profile_requests is None:
+            return None
+        user_profile_cns += [
+            request["common_name"] for request in user_profile_requests
+        ]
+    # user has other requests
+
     max_profile_index = -1
-    for filename in user_profile_filenames:
+    for cn in user_profile_cns:
         try:
-            pattern = re.compile(rf"^{ username }-(\d+)\.ovpn$")
-            match = pattern.match(filename)
+            pattern = re.compile(rf"^{ username }-(\d+)$")
+            match = pattern.match(cn)
             if match:
                 profile_index = int(match.group(1))
                 max_profile_index = max(profile_index, max_profile_index)
         except:
             pass
         # should actually never happen
-
-    if user_profile_requests_now != 0:
-        user_profile_requests = db.list_user_profile_requests(username)
-        if user_profile_requests is None:
-            return None
-        
-        for request in user_profile_requests:
-            try:
-                pattern = re.compile(rf"^{ username }-(\d+)$")
-                match = pattern.match(request["common_name"])
-                if match:
-                    profile_index = int(match.group(1))
-                    max_profile_index = max(profile_index, max_profile_index)
-            except:
-                pass
-    # user has other requests
             
     # TODO: check cn existance
 

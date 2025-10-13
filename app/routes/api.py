@@ -160,6 +160,39 @@ def api_list_invites():
     return jsonify({"success": True, "codes": codes})
 
 
+@bp.route("/api/list/servers")
+def api_list_servers():
+    return jsonify({"success": True, "common_names": vpn_servers.list_servers()})
+
+
+@bp.route("/api/list/profiles")
+def api_list_profiles():
+    username = session["username"]
+
+    if not username:
+        return jsonify({"success": False, "msg": "User unauthorized"}), 401
+    elif username == "Admin":
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "msg": "Admin is not allowed to access this endpoint",
+                }
+            ),
+            403,
+        )
+    
+    server_cns = vpn_servers.list_servers()
+    common_names = {}
+    for server_cn in server_cns:
+        cns = profiles.list_user_profile_common_names(server_cn, username)
+        if cns is None:
+            return jsonify({"success": False, "msg": "Failed to get profile common names"}), 500
+        common_names[server_cn] = cns
+
+    return jsonify({"success": True, "common_names": common_names})
+
+
 @bp.route("/api/list/profilereqs")
 def api_list_profilereqs():
     username = session["username"]

@@ -1,7 +1,4 @@
-let serverCns = null;
-let serverCnsLoaded = false;
-
-const loadServerCnsPromise = new Promise(async (resolve) => {
+async function initRequestProfileServerSelectOptions(select) {
     try {
         let res = await fetch('/api/list/servers', {
             method: 'GET',
@@ -9,25 +6,19 @@ const loadServerCnsPromise = new Promise(async (resolve) => {
         });
         let data = await res.json();
         if (data.success) {
-            serverCns = data.common_names;
-            serverCnsLoaded = true;
+            data.common_names.forEach(cn => {
+                const option = document.createElement("option");
+                option.text = cn;
+                option.value = cn;
+                select.appendChild(option);
+            });
         }
         else {
             alert('获取服务器列表失败：' + data.msg);
         }
-    } catch(err) {
+    } catch (err) {
         alert('请求失败：' + err.message);
     }
-    resolve();
-});
-
-function initRequestProfileServerSelectOptions(select) {
-    serverCns.forEach(cn => {
-        const option = document.createElement("option");
-        option.text = cn;
-        option.value = cn;
-        select.appendChild(option);
-    });
 }
 
 async function requestProfile(serverCn, num) {
@@ -44,7 +35,50 @@ async function requestProfile(serverCn, num) {
         else {
             alert('申请失败：' + data.msg);
         }
-    } catch(err) {
+    } catch (err) {
+        alert('请求失败：' + err.message);
+    }
+}
+
+async function refreshProfilesTable(tbody) {
+    try {
+        let res = await fetch('/api/list/profiles', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        let data = await res.json();
+        if (data.success) {
+            tbody.innerHTML = '';
+            let i = 0;
+            Object.entries(data.common_names).forEach(([server_cn, cns]) => {
+                cns.forEach(cn => {
+                    const row = document.createElement('tr');
+                    i++;
+
+                    const idCell = document.createElement('td');
+                    idCell.textContent = i;
+                    const targetServerCell = document.createElement('td');
+                    targetServerCell.textContent = server_cn;
+                    const cnCell = document.createElement('td');
+                    cnCell.textContent = cn;
+                    const downloadLinkCell = document.createElement('td');
+                    downloadLinkCell.textContent = '下载';
+
+                    row.appendChild(idCell);
+                    row.appendChild(targetServerCell);
+                    row.appendChild(cnCell);
+                    row.appendChild(downloadLinkCell);
+
+                    tbody.appendChild(row);
+                });
+            });
+        }
+        else {
+            alert('刷新 Profiles 失败：' + data.msg);
+        }
+    } catch (err) {
         alert('请求失败：' + err.message);
     }
 }
@@ -64,7 +98,7 @@ async function refreshProfileRequestsTable(tbody) {
             data.requests.forEach(request => {
                 const row = document.createElement('tr');
                 i++;
-    
+
                 const idCell = document.createElement('td');
                 idCell.textContent = i;
                 const targetServerCell = document.createElement('td');
@@ -80,37 +114,36 @@ async function refreshProfileRequestsTable(tbody) {
                 else {
                     statusCell.textContent = '等待审核';
                 }
-    
+
                 row.appendChild(idCell);
                 row.appendChild(targetServerCell);
                 row.appendChild(cnCell);
                 row.appendChild(requestTimeCell);
                 row.appendChild(statusCell);
-    
+
                 tbody.appendChild(row);
             });
         }
         else {
-            alert('刷新 Profiles 失败：' + data.msg);
+            alert('刷新 Profiles 申请失败：' + data.msg);
         }
-    } catch(err) {
+    } catch (err) {
         alert('请求失败：' + err.message);
     }
 }
 
 if (document.getElementById('userContainer')) {
 
+    const profilesTable = document.getElementById('profilesTable');
+    const profilesTableTbody = profilesTable.getElementsByTagName('tbody')[0];
     const requestProfileServerSelect = document.getElementById('requestProfileServerSelect');
     const requestProfileNumInput = document.getElementById('requestProfileNumInput');
     const requestProfileButton = document.getElementById('requestProfileButton');
     const profileRequestsTable = document.getElementById('profileRequestsTable');
     const profileRequestsTableTbody = profileRequestsTable.getElementsByTagName('tbody')[0];
 
-    loadServerCnsPromise.then(() => {
-        if (serverCnsLoaded) {
-            initRequestProfileServerSelectOptions(requestProfileServerSelect);
-        }
-    });
+    initRequestProfileServerSelectOptions(requestProfileServerSelect);
+    refreshProfilesTable(profilesTableTbody);
     refreshProfileRequestsTable(profileRequestsTableTbody);
 
     requestProfileButton.addEventListener('click', async function () {
