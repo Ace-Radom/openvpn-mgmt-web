@@ -1,5 +1,5 @@
 bind = "127.0.0.1:9532"
-workers = 2
+workers = 4
 forwarded_allow_ips = "*"
 
 accesslog = "-"
