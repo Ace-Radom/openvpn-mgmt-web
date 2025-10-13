@@ -21,6 +21,33 @@ async function initRequestProfileServerSelectOptions(select) {
     }
 }
 
+async function downloadProfile(serverCn, cn) {
+    try {
+        let endpoint = `/download/profiles/${serverCn}/${cn}`
+        let res = await fetch(endpoint, {
+            method: 'GET'
+        });
+        if (!res.ok) {
+            let data = await res.json();
+            alert('下载失败：' + data.msg);
+            return;
+        }
+
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `${cn}.ovpn`;
+        document.body.appendChild(a);
+        a.click();
+
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+        alert('请求失败：' + err.message);
+    }
+}
+
 async function requestProfile(serverCn, num) {
     try {
         let res = await fetch('/api/reqprofile', {
@@ -52,7 +79,7 @@ async function refreshProfilesTable(tbody) {
         if (data.success) {
             tbody.innerHTML = '';
             let i = 0;
-            Object.entries(data.common_names).forEach(([server_cn, cns]) => {
+            Object.entries(data.common_names).forEach(([serverCn, cns]) => {
                 cns.forEach(cn => {
                     const row = document.createElement('tr');
                     i++;
@@ -62,9 +89,16 @@ async function refreshProfilesTable(tbody) {
                     const cnCell = document.createElement('td');
                     cnCell.textContent = cn;
                     const targetServerCell = document.createElement('td');
-                    targetServerCell.textContent = server_cn;
+                    targetServerCell.textContent = serverCn;
                     const downloadLinkCell = document.createElement('td');
-                    downloadLinkCell.textContent = '下载';
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = '#';
+                    downloadLink.textContent = '下载';
+                    downloadLink.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        await downloadProfile(serverCn, cn);
+                    });
+                    downloadLinkCell.appendChild(downloadLink);
 
                     row.appendChild(idCell);
                     row.appendChild(cnCell);
