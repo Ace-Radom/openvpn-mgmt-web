@@ -80,6 +80,7 @@ async function refreshProfilesTable(tbody) {
             tbody.innerHTML = '';
             let i = 0;
             Object.entries(data.common_names).forEach(([serverCn, cns]) => {
+                cns.sort((a, b) => a.localeCompare(b, 'en'));
                 cns.forEach(cn => {
                     const row = document.createElement('tr');
                     i++;
