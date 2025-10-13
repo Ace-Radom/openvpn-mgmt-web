@@ -4,32 +4,37 @@ function validateUsername(username) {
     return REGEX_USERNAME.test(username);
 }
 
-function generateInvitationCode(username) {
-    fetch('/api/invite', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username })
-    })
-        .then(response => response.json())
-        .then(data => {
-            alert('邀请码: ' + data.code);
-        })
-        .catch(error => {
-            alert('生成失败: ' + error);
+async function generateInvitationCode(username) {
+    try {
+        let res = await fetch('/api/invite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username })
         });
+        let data = await res.json();
+        if (data.success) {
+            alert('邀请码: ' + data.code);
+        }
+        else {
+            alert('生成失败: ' + data.msg);
+        }
+    } catch (err) {
+        alert('请求失败：' + err.message);
+    }
 }
 
-function refreshInvitationCodesTable(tbody) {
-    fetch('/api/list/invites', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
+async function refreshInvitationCodesTable(tbody) {
+    try {
+        let res = await fetch('/api/list/invites', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        let data = await res.json();
+        if (data.success) {
             tbody.innerHTML = '';
             data.codes.forEach(code => {
                 const row = document.createElement('tr');
@@ -53,10 +58,57 @@ function refreshInvitationCodesTable(tbody) {
 
                 tbody.appendChild(row);
             });
-        })
-        .catch(error => {
-            alert('刷新邀请码表失败：' + error);
-        })
+        }
+        else {
+            alert('刷新邀请码失败：' + data.msg);
+        }
+    } catch (err) {
+        alert('请求失败：' + err.message);
+    }
+}
+
+async function refreshProfileRequestsComfirmTable(tbody) {
+    try {
+        let res = await fetch('/api/list/profilereqs', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        let data = await res.json();
+        if (data.success) {
+            tbody.innerHTML = '';
+            let i = 0;
+            data.requests.forEach(request => {
+                const row = document.createElement('tr');
+                i++;
+
+                const idCell = document.createElement('td');
+                idCell.textContent = i;
+                const targetServerCell = document.createElement('td');
+                targetServerCell.textContent = request.server_common_name;
+                const cnCell = document.createElement('td');
+                cnCell.textContent = request.common_name;
+                const requestTimeCell = document.createElement('td');
+                requestTimeCell.textContent = convertTimestampToString(request.request_time_ts, true);
+                const operateCell = document.createElement('td');
+                operateCell.textContent = '通过 驳回';
+
+                row.appendChild(idCell);
+                row.appendChild(targetServerCell);
+                row.appendChild(cnCell);
+                row.appendChild(requestTimeCell);
+                row.appendChild(operateCell);
+
+                tbody.appendChild(row);
+            });
+        }
+        else {
+            alert('刷新 Profile 申请失败：' + data.msg);
+        }
+    } catch (err) {
+        alert('请求失败：' + err.message);
+    }
 }
 
 if (document.getElementById('adminContainer')) {
@@ -65,18 +117,21 @@ if (document.getElementById('adminContainer')) {
     const generateInvitationCodeButton = document.getElementById('generateInvitationCodeButton');
     const invitationCodesTable = document.getElementById('invitationCodesTable');
     const invitationCodesTableTbody = invitationCodesTable.getElementsByTagName('tbody')[0];
+    const profileRequestsConfirmTable = document.getElementById('profileRequestsConfirmTable');
+    const profileRequestsConfirmTableTbody = profileRequestsConfirmTable.getElementsByTagName('tbody')[0];
 
-    refreshInvitationCodesTable(invitationCodesTableTbody)
+    refreshInvitationCodesTable(invitationCodesTableTbody);
+    refreshProfileRequestsComfirmTable(profileRequestsConfirmTableTbody);
 
-    generateInvitationCodeButton.addEventListener('click', function () {
+    generateInvitationCodeButton.addEventListener('click', async function () {
         let username = generateInvitationCodeInput.value;
         if (!validateUsername(username)) {
             alert('用户名不合法："' + username + '"');
             return;
         }
 
-        generateInvitationCode(username);
-        refreshInvitationCodesTable(invitationCodesTableTbody);
+        await generateInvitationCode(username);
+        await refreshInvitationCodesTable(invitationCodesTableTbody);
     });
 
 }
