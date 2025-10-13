@@ -59,16 +59,16 @@ async function refreshProfilesTable(tbody) {
 
                     const idCell = document.createElement('td');
                     idCell.textContent = i;
-                    const targetServerCell = document.createElement('td');
-                    targetServerCell.textContent = server_cn;
                     const cnCell = document.createElement('td');
                     cnCell.textContent = cn;
+                    const targetServerCell = document.createElement('td');
+                    targetServerCell.textContent = server_cn;
                     const downloadLinkCell = document.createElement('td');
                     downloadLinkCell.textContent = '下载';
 
                     row.appendChild(idCell);
-                    row.appendChild(targetServerCell);
                     row.appendChild(cnCell);
+                    row.appendChild(targetServerCell);
                     row.appendChild(downloadLinkCell);
 
                     tbody.appendChild(row);
@@ -101,10 +101,10 @@ async function refreshProfileRequestsTable(tbody) {
 
                 const idCell = document.createElement('td');
                 idCell.textContent = i;
-                const targetServerCell = document.createElement('td');
-                targetServerCell.textContent = request.server_common_name;
                 const cnCell = document.createElement('td');
                 cnCell.textContent = request.common_name;
+                const targetServerCell = document.createElement('td');
+                targetServerCell.textContent = request.server_common_name;
                 const requestTimeCell = document.createElement('td');
                 requestTimeCell.textContent = convertTimestampToString(request.request_time_ts, true);
                 const statusCell = document.createElement('td');
@@ -116,8 +116,8 @@ async function refreshProfileRequestsTable(tbody) {
                 }
 
                 row.appendChild(idCell);
-                row.appendChild(targetServerCell);
                 row.appendChild(cnCell);
+                row.appendChild(targetServerCell);
                 row.appendChild(requestTimeCell);
                 row.appendChild(statusCell);
 

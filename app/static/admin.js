@@ -118,10 +118,10 @@ async function refreshProfileRequestsComfirmTable(tbody) {
 
                 const idCell = document.createElement('td');
                 idCell.textContent = i;
-                const targetServerCell = document.createElement('td');
-                targetServerCell.textContent = request.server_common_name;
                 const cnCell = document.createElement('td');
                 cnCell.textContent = request.common_name;
+                const targetServerCell = document.createElement('td');
+                targetServerCell.textContent = request.server_common_name;
                 const requestTimeCell = document.createElement('td');
                 requestTimeCell.textContent = convertTimestampToString(request.request_time_ts, true);
                 const operateCell = document.createElement('td');
@@ -145,8 +145,8 @@ async function refreshProfileRequestsComfirmTable(tbody) {
                 operateCell.appendChild(rejectLink);
 
                 row.appendChild(idCell);
-                row.appendChild(targetServerCell);
                 row.appendChild(cnCell);
+                row.appendChild(targetServerCell);
                 row.appendChild(requestTimeCell);
                 row.appendChild(operateCell);
 
