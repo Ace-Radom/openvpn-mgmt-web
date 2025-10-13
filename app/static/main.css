@@ -167,6 +167,55 @@ button:focus {
     box-shadow: 0 4px 20px rgba(32, 115, 224, 0.12);
 }
 
+.sectionContent {
+    position: relative;
+}
+
+.sectionContent select {
+    width: 100%;
+    padding: 10px 34px 10px 13px;
+    border-radius: 7px;
+    border: 1px solid #dbe7f3;
+    background: #f6fafd;
+    font-size: 1rem;
+    color: #003b70;
+    outline: none;
+    box-sizing: border-box;
+    appearance: none;
+    cursor: pointer;
+
+    background-image: linear-gradient(90deg, #2073e0 70%, #48b1f3 100%),
+        url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23003b70' class='arrow'><path d='M2 4l5 6 5-6z'/></svg>");
+    background-repeat: no-repeat, no-repeat;
+    background-position: right 12px center, right 12px center;
+    background-size: 0 100%, 14px;
+
+    transition: border-color 0.2s, box-shadow 0.2s, background-size 0.25s ease, transform 0.25s ease;
+}
+
+.sectionContent select:hover {
+    background-color: #fff;
+    border-color: #c9def3;
+}
+
+.sectionContent select[data-open="true"] {
+    transform: rotateX(0deg);
+    background-image: linear-gradient(90deg, #2073e0 70%, #48b1f3 100%),
+        url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23003b70' transform='rotate(180)'><path d='M2 4l5 6 5-6z'/></svg>");
+}
+
+.sectionContent option {
+    background-color: #fff;
+    color: #003b70;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.sectionContent option:hover,
+.sectionContent option:checked {
+    background-color: rgba(32, 115, 224, 0.1);
+}
+
 .sectionContent .inputRow {
     display: flex;
     align-items: left;
@@ -189,6 +238,12 @@ button:focus {
 .sectionContent .inputRow button {
     width: 140px;
     padding: 11px 0;
+}
+
+.sectionContent .inputRow select {
+    flex: 1;
+    min-width: 100px;
+    max-width: 200px;
 }
 
 .sectionContent .numberInput {

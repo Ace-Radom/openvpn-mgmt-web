@@ -1,6 +1,6 @@
 // .numberInput
 // min, max should be set in html, step=1
-document.querySelectorAll('.numberInput').forEach(container => {
+document.querySelectorAll('.sectionContent .numberInput').forEach(container => {
     const input = container.querySelector('input[type="number"]');
     container.querySelector('.increment').addEventListener('click', () => {
         input.value = Math.min(Number(input.value) + 1, input.max ? Number(input.max) : 32767);
@@ -25,6 +25,14 @@ document.querySelectorAll('.numberInput').forEach(container => {
     });
     input.addEventListener('blur', () => {
         input.dispatchEvent(new Event('change'));
+    });
+});
+
+
+// select
+document.querySelectorAll('.sectionContent select').forEach(sel => {
+    sel.addEventListener('mousedown', () => {
+        sel.dataset.open = sel.dataset.open === "true" ? "false" : "true";
     });
 });
 

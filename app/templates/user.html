@@ -22,6 +22,9 @@
                     <div class="sectionContent">
                         <label>Profile 申请</label>
                         <div class="inputRow">
+                            <select id="requestProfileServerSelect">
+                                <option value="">请选择服务器</option>
+                            </select>
                             <p>数量：</p>
                             <div class="numberInput">
                                 <button type="button" class="decrement">-</button>
@@ -32,8 +35,8 @@
                         </div>
                     </div>
                     <div class="sectionContent">
-                        <label>Profile 状态</label>
-                        <table id="profileStatusTable">
+                        <label>Profile 申请列表</label>
+                        <table id="profileRequestsTable">
                             <thead>
                                 <tr>
                                     <th>序号</th>
@@ -41,7 +44,6 @@
                                     <th>CN</th>
                                     <th>申请时间</th>
                                     <th>状态</th>
-                                    <th>下载</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

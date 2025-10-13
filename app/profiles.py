@@ -187,12 +187,12 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
         filename for filename in profile_filenames if filename.startswith(username)
     ]
 
-    user_profiles_requests_now = db.count_user_profile_requests(username, server_cn)
-    if user_profiles_requests_now == -1:
+    user_profile_requests_now = db.count_user_profile_requests(username, server_cn)
+    if user_profile_requests_now == -1:
         return None
 
     if (
-        len(user_profile_filenames) + user_profiles_requests_now + num
+        len(user_profile_filenames) + user_profile_requests_now + num
         > max_profiles_per_user
     ):
         return []
@@ -209,6 +209,24 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
         except:
             pass
         # should actually never happen
+
+    if user_profile_requests_now != 0:
+        user_profile_requests = db.list_user_profile_requests(username)
+        if user_profile_requests is None:
+            return None
+        
+        for request in user_profile_requests:
+            try:
+                pattern = re.compile(rf"^{ username }-(\d+)$")
+                match = pattern.match(request["common_name"])
+                if match:
+                    profile_index = int(match.group(1))
+                    max_profile_index = max(profile_index, max_profile_index)
+            except:
+                pass
+    # user has other requests
+            
+    # TODO: check cn existance
 
     new_cns = []
     for i in range(max_profile_index + 1, max_profile_index + 1 + num):
