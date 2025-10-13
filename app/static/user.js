@@ -39,18 +39,20 @@ async function refreshProfileStatusTable(tbody) {
             const requestTimeCell = document.createElement('td');
             requestTimeCell.textContent = convertTimestampToString(request.request_time_ts, true);
             const statusCell = document.createElement('td');
-            statusCell.textContent = '等待审核';
-            const noteCell = document.createElement('td');
-            noteCell.textContent = '';
+            if (data.is_rejected) {
+                statusCell.textContent = '审核未通过';
+            }
+            else {
+                statusCell.textContent = '等待审核';
+            }
             const downloadCell = document.createElement('td');
-            downloadCell.textContent = '下载';
+            downloadCell.textContent = '';
 
             row.appendChild(idCell);
             row.appendChild(targetServerCell);
             row.appendChild(cnCell);
             row.appendChild(requestTimeCell);
             row.appendChild(statusCell);
-            row.appendChild(noteCell);
             row.appendChild(downloadCell);
 
             tbody.appendChild(row);

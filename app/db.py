@@ -62,6 +62,7 @@ def init_db() -> bool:
                 server_common_name TEXT NOT NULL,
                 common_name TEXT NOT NULL,
                 request_time_ts INTEGER NOT NULL,
+                is_rejected BOOL NOT NULL,
                 FOREIGN KEY(uid) REFERENCES users(id)
             );
         """
@@ -320,7 +321,10 @@ def add_profile_requests(
     try:
         for cn in common_names:
             c.execute(
-                "INSERT INTO profile_requests (uid, server_common_name, common_name, request_time_ts) VALUES (?, ?, ?, ?);",
+                """
+                INSERT INTO profile_requests (uid, server_common_name, common_name, request_time_ts, is_rejected)
+                VALUES (?, ?, ?, ?, FALSE);
+            """,
                 (
                     uid,
                     server_cn,
@@ -359,6 +363,18 @@ def count_user_profile_requests(username: str, server_cn: str = "") -> int:
     return count
 
 
+def count_all_profile_requests(server_cn: str = "") -> int:
+    conn = get_conn()
+    c = conn.cursor()
+    if server_cn == "":
+        c.execute("SELECT COUNT(*) FROM profile_requests;")
+    else:
+        c.execute("SELECT COUNT(*) FROM profile_requests WHERE server_common_name = ?;", (server_cn,))
+    count = c.fetchone()[0]
+
+    return count
+
+
 def list_user_profile_requests(username: str) -> list | None:
     uid = get_uid_with_username(username)
     if uid == -1:
@@ -367,6 +383,15 @@ def list_user_profile_requests(username: str) -> list | None:
     conn = get_conn()
     c = conn.cursor()
     c.execute("SELECT * FROM profile_requests WHERE uid = ?;", (uid,))
+    rows = [dict(row) for row in c.fetchall()]
+    conn.close()
+    return rows
+
+
+def list_all_profile_requests() -> list | None:
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute("SELECT * FROM profile_requests;")
     rows = [dict(row) for row in c.fetchall()]
     conn.close()
     return rows

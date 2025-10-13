@@ -1,4 +1,3 @@
-import datetime
 import re
 from flask import (
     Blueprint,
@@ -168,17 +167,10 @@ def api_list_profilereqs():
     if not username:
         return jsonify({"success": False, "msg": "User unauthorized"}), 401
     elif username == "Admin":
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "msg": "Admin is not allowed to access this endpoint",
-                }
-            ),
-            403,
-        )
+        requests_data = db.list_all_profile_requests()
+    else:
+        requests_data = db.list_user_profile_requests(username)
 
-    requests_data = db.list_user_profile_requests(username)
     if requests_data is None:
         return jsonify({"success": False, "msg": "DB error"}), 500
     # this should never happen: if username is not found in users table, sth is wrong with the db
@@ -186,7 +178,7 @@ def api_list_profilereqs():
     requests = [
         {
             k: data[k]
-            for k in ["server_common_name", "common_name", "request_time_ts"]
+            for k in ["server_common_name", "common_name", "request_time_ts", "is_rejected"]
             if k in data.keys()
         }
         for data in requests_data
