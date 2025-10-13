@@ -43,7 +43,8 @@ gmail.secure_gmail_related_files()
 redis_helper.init()
 vpn_servers.init()
 
-profiles.sync_profile_cache("debug")
+for server in vpn_servers.list_servers():
+    profiles.sync_profile_cache(server)
 
 if not db.admin_exists():
     if not db.add_admin():
