@@ -187,7 +187,6 @@ def api_list_profiles():
     for server_cn in server_cns:
         cns = profiles.list_user_profile_common_names(server_cn, username)
         if cns is None:
-            continue
             return (
                 jsonify(
                     {"success": False, "msg": "Failed to get profile common names"}
