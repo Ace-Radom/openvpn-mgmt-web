@@ -125,4 +125,4 @@ def exists(server_cn: str):
 
 
 def list_servers() -> list:
-    return vpn_servers.keys()
+    return list(vpn_servers.keys())
