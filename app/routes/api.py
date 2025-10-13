@@ -181,13 +181,18 @@ def api_list_profiles():
             ),
             403,
         )
-    
+
     server_cns = vpn_servers.list_servers()
     common_names = {}
     for server_cn in server_cns:
         cns = profiles.list_user_profile_common_names(server_cn, username)
         if cns is None:
-            return jsonify({"success": False, "msg": "Failed to get profile common names"}), 500
+            return (
+                jsonify(
+                    {"success": False, "msg": "Failed to get profile common names"}
+                ),
+                500,
+            )
         common_names[server_cn] = cns
 
     return jsonify({"success": True, "common_names": common_names})
@@ -211,7 +216,12 @@ def api_list_profilereqs():
     requests = [
         {
             k: data[k]
-            for k in ["server_common_name", "common_name", "request_time_ts", "is_rejected"]
+            for k in [
+                "server_common_name",
+                "common_name",
+                "request_time_ts",
+                "is_rejected",
+            ]
             if k in data.keys()
         }
         for data in requests_data

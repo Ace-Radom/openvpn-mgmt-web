@@ -369,7 +369,10 @@ def count_all_profile_requests(server_cn: str = "") -> int:
     if server_cn == "":
         c.execute("SELECT COUNT(*) FROM profile_requests;")
     else:
-        c.execute("SELECT COUNT(*) FROM profile_requests WHERE server_common_name = ?;", (server_cn,))
+        c.execute(
+            "SELECT COUNT(*) FROM profile_requests WHERE server_common_name = ?;",
+            (server_cn,),
+        )
     count = c.fetchone()[0]
 
     return count

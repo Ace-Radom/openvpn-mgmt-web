@@ -171,18 +171,16 @@ def list_user_profile_common_names(server_cn: str, username: str) -> list | None
     """
     if not servers.exists(server_cn):
         return None
-    
+
     index = get_profile_index(server_cn)
     if index is None:
         return None
-    
+
     profile_filenames = [data["filename"] for data in index["profiles"]]
     user_profile_filenames = [
         filename for filename in profile_filenames if filename.startswith(username)
     ]
-    cns = [
-        os.path.splitext(filename)[0] for filename in user_profile_filenames
-    ]
+    cns = [os.path.splitext(filename)[0] for filename in user_profile_filenames]
     return cns
 
 
@@ -210,10 +208,7 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
     if user_profile_requests_now == -1:
         return None
 
-    if (
-        len(user_profile_cns) + user_profile_requests_now + num
-        > max_profiles_per_user
-    ):
+    if len(user_profile_cns) + user_profile_requests_now + num > max_profiles_per_user:
         return []
     # more profiles than max_profiles_per_user, deny & return an empty list
 
@@ -237,7 +232,7 @@ def request_profiles(server_cn: str, username: str, num: int) -> list | None:
         except:
             pass
         # should actually never happen
-            
+
     # TODO: check cn existance
 
     new_cns = []
