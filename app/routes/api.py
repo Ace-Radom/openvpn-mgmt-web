@@ -141,25 +141,29 @@ def api_reqprofile():
     return jsonify({"success": True, "common_names": new_cns})
 
 
-
 @bp.route("/api/newpswd", methods=["POST"])
 def api_newpswd():
     username = session["username"]
 
     if not username:
         return jsonify({"success": False, "msg": "User unauthorized"}), 401
-    
+
     data = request.json
     old_password = data.get("old_password")
     new_password = data.get("new_password")
     if not old_password or not new_password:
-        return jsonify({"success": False, "msg": "Old password and new password are required"}), 400
+        return (
+            jsonify(
+                {"success": False, "msg": "Old password and new password are required"}
+            ),
+            400,
+        )
     if not db.check_user_password(username, old_password):
         return jsonify({"success": False, "msg": "Incorrect old password"}), 403
-    
+
     if not db.change_user_password(username, new_password):
         return jsonify({"success": False, "msg": "Fail to set new password"}), 500
-    
+
     session["allow_success"] = True
     return jsonify({"success": True, "msg": "Change password successful"})
 
@@ -266,13 +270,21 @@ def api_operate_profilereq():
             ),
             403,
         )
-    
+
     data = request.json
     server_cn = data.get("server_common_name")
     cn = data.get("common_name")
     op = data.get("operation")
     if not server_cn or not cn or not op:
-        return jsonify({"success": False, "msg": "Server Common_name, common_name and operation required"}), 400
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "msg": "Server Common_name, common_name and operation required",
+                }
+            ),
+            400,
+        )
     if op not in ["approve", "reject"]:
         return jsonify({"success": False, "msg": "Illegal operation"}), 400
     if not vpn_servers.exists(server_cn):
@@ -284,13 +296,18 @@ def api_operate_profilereq():
         )
     if not db.profile_request_exists(server_cn, cn):
         return jsonify({"success": False, "msg": "Profile request doesn't exist"}), 400
-    
+
     if op == "approve":
         if not profiles.approve_profile_request(server_cn, cn):
-            return jsonify({"success": False, "msg": "Failed to confirm profile request"}), 500
+            return (
+                jsonify({"success": False, "msg": "Failed to confirm profile request"}),
+                500,
+            )
     elif op == "reject":
         if not profiles.reject_profile_request(server_cn, cn):
-            return jsonify({"success": False, "msg": "Failed to reject profile request"}), 500
+            return (
+                jsonify({"success": False, "msg": "Failed to reject profile request"}),
+                500,
+            )
 
-    return jsonify({"success": True})    
-    
+    return jsonify({"success": True})

@@ -236,7 +236,10 @@ def change_user_password(username: str, new_password: str) -> bool:
             UPDATE users SET password_hash = ?
             WHERE username = ?;
         """,
-            (password_hash, username,)
+            (
+                password_hash,
+                username,
+            ),
         )
         conn.commit()
         return True
@@ -422,23 +425,37 @@ def list_all_profile_requests() -> list | None:
     conn.close()
     return rows
 
+
 def profile_request_exists(server_cn: str, common_name: str) -> bool:
     conn = get_conn()
     c = conn.cursor()
-    c.execute("SELECT 1 FROM profile_requests WHERE server_common_name = ? AND common_name = ?;", (server_cn, common_name,))
+    c.execute(
+        "SELECT 1 FROM profile_requests WHERE server_common_name = ? AND common_name = ?;",
+        (
+            server_cn,
+            common_name,
+        ),
+    )
     result = c.fetchone()
     conn.close()
     return result is not None
 
+
 def delete_profile_request(server_cn: str, common_name: str) -> bool:
     if not profile_request_exists(server_cn, common_name):
         return False
-    
+
     conn = get_conn()
     c = conn.cursor()
 
     try:
-        c.execute("DELETE FROM profile_requests WHERE server_common_name = ? AND common_name = ?;", (server_cn, common_name,))
+        c.execute(
+            "DELETE FROM profile_requests WHERE server_common_name = ? AND common_name = ?;",
+            (
+                server_cn,
+                common_name,
+            ),
+        )
         conn.commit()
         return True
     except:
@@ -447,10 +464,11 @@ def delete_profile_request(server_cn: str, common_name: str) -> bool:
     finally:
         conn.close()
 
+
 def reject_profile_request(server_cn: str, common_name: str) -> bool:
     if not profile_request_exists(server_cn, common_name):
         return False
-    
+
     conn = get_conn()
     c = conn.cursor()
 
@@ -461,7 +479,10 @@ def reject_profile_request(server_cn: str, common_name: str) -> bool:
             SET is_rejected = TRUE
             WHERE server_common_name = ? AND common_name = ?;
         """,
-            (server_cn, common_name,)
+            (
+                server_cn,
+                common_name,
+            ),
         )
         conn.commit()
         return True

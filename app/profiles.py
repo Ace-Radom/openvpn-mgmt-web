@@ -251,44 +251,48 @@ def approve_profile_request(server_cn: str, common_name: str) -> bool:
         return False
     if not db.profile_request_exists(server_cn, common_name):
         return False
-    if check_cn_exists(server_cn, common_name) or check_profile_exists(server_cn, common_name):
+    if check_cn_exists(server_cn, common_name) or check_profile_exists(
+        server_cn, common_name
+    ):
         return False
-    
+
     if not vpn_servers[server_cn].add_profile(common_name.split("-")[0], common_name):
         return False
     if not sync_profile_cache(server_cn):
         return False
     if not db.delete_profile_request(server_cn, common_name):
         return False
-    
+
     return True
+
 
 def reject_profile_request(server_cn: str, common_name: str) -> bool:
     if not servers.exists(server_cn):
         return False
     if not db.profile_request_exists(server_cn, common_name):
         return False
-    
+
     return db.reject_profile_request(server_cn, common_name)
+
 
 def get_profile_path(server_cn: str, common_name: str) -> str | None:
     if not servers.exists(server_cn):
         return None
     if not check_cn_exists(server_cn, common_name):
         return None
-    
+
     if vpn_servers[server_cn].check_profile_cache_enabled():
         cache_dir = get_profile_cache_dir(server_cn)
         profile_cache_path = os.path.join(cache_dir, f"{ common_name }.ovpn")
         if os.path.exists(profile_cache_path):
             # TODO: hash check
             return profile_cache_path
-        
+
     # cache not enabled / cached profile doesn't exist
-    
+
     temp_path = utils.gen_temp_path()
     if not vpn_servers[server_cn].download_profile(common_name, temp_path):
         return None
-    
+
     return temp_path
     # TODO: remove this temp file somehow
