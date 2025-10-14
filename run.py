@@ -40,16 +40,6 @@ if not db.init_db():
 # gmail.auth_gmail_api()
 # gmail.secure_gmail_related_files()
 
-gmailv2.send_email(
-            "sichenradomlyu@gmail.com",
-            "您的账户已被激活 - OpenVPN Mgmt",
-            "welcome_zhCN.html",
-            {
-                "username": "Sichen",
-                "login_url": utils.build_server_link("login", is_public_link=True),
-            },
-        )
-
 redis_helper.init()
 vpn_servers.init()
 
