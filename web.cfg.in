@@ -43,3 +43,4 @@ discovery_path=/var/openvpn-mgmt/web/gmail/gmail_v1_discovery.json
 token_path=/var/openvpn-mgmt/web/gmail/token.json
 secret_path=/var/openvpn-mgmt/web/gmail/secret.json
 sender_email_addr=
+app_pswd=

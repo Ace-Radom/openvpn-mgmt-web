@@ -5,7 +5,7 @@ import urllib3
 from flask_session import Session as ServerSideSession
 
 from app import config, create_app, db, profiles, vpn_servers, utils
-from app.email import gmail
+from app.email import gmail, gmailv2
 from app.helpers import redis_helper
 
 base_dir = os.path.split(os.path.realpath(__file__))[0]
@@ -36,9 +36,19 @@ ServerSideSession(app)
 if not db.init_db():
     raise RuntimeError("Init DB failed")
 
-gmail.fetch_gmail_discovery()
-gmail.auth_gmail_api()
-gmail.secure_gmail_related_files()
+# gmail.fetch_gmail_discovery()
+# gmail.auth_gmail_api()
+# gmail.secure_gmail_related_files()
+
+gmailv2.send_email(
+            "sichenradomlyu@gmail.com",
+            "您的账户已被激活 - OpenVPN Mgmt",
+            "welcome_zhCN.html",
+            {
+                "username": "Sichen",
+                "login_url": utils.build_server_link("login", is_public_link=True),
+            },
+        )
 
 redis_helper.init()
 vpn_servers.init()

@@ -37,6 +37,7 @@ config = {
         "token_path": "/var/openvpn-mgmt/web/gmail/token.json",
         "secret_path": "/var/openvpn-mgmt/web/gmail/secret.json",
         "sender_email_addr": None,
+        "app_pswd": None,
     },
 }
 
@@ -264,3 +265,5 @@ def parse_config(config_path: str):
             and parser["gmail"]["sender_email_addr"].find("@gmail.com") != -1
         ):
             config["gmail"]["sender_email_addr"] = parser["gmail"]["sender_email_addr"]
+        if parser.has_option("gmail", "app_pswd") and len(parser["gmail"]["app_pswd"]) != 0:
+            config["gmail"]["app_pswd"] = parser["gmail"]["app_pswd"]
