@@ -56,6 +56,12 @@ def user():
     return render_template("user.html", username=session["username"])
 
 
+@bp.route("/newpswd")
+def newpswd():
+    if "username" not in session:
+        return redirect(url_for("view.login"))
+    return render_template("newpswd.html")
+
 @bp.route("/success")
 def success():
     if not session.pop("allow_success", None):

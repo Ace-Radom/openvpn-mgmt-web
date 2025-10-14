@@ -141,6 +141,29 @@ def api_reqprofile():
     return jsonify({"success": True, "common_names": new_cns})
 
 
+
+@bp.route("/api/newpswd", methods=["POST"])
+def api_newpswd():
+    username = session["username"]
+
+    if not username:
+        return jsonify({"success": False, "msg": "User unauthorized"}), 401
+    
+    data = request.json
+    old_password = data.get("old_password")
+    new_password = data.get("new_password")
+    if not old_password or not new_password:
+        return jsonify({"success": False, "msg": "Old password and new password are required"}), 400
+    if not db.check_user_password(username, old_password):
+        return jsonify({"success": False, "msg": "Incorrect old password"}), 403
+    
+    if not db.change_user_password(username, new_password):
+        return jsonify({"success": False, "msg": "Fail to set new password"}), 500
+    
+    session["allow_success"] = True
+    return jsonify({"success": True, "msg": "Change password successful"})
+
+
 @bp.route("/api/list/invites")
 def api_list_invites():
     if not session["username"]:

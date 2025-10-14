@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Change Password</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='simplified.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+</head>
+
+<body>
+    <div class="main-card">
+        <h2>更改密码</h2>
+        <form id="newpswd-form">
+            <div class="form-group">
+                <input type="password" name="old_pswd" id="old_pswd" placeholder="请输入旧密码" required>
+                <span class="input-icon" id="old_pswd_icon"></span>
+            </div>
+            <div class="form-group">
+                <input type="password" name="new_pswd" id="new_pswd" placeholder="请输入新密码" required>
+                <span class="input-icon" id="new_pswd_icon"></span>
+            </div>
+            <div class="form-group">
+                <input type="password" name="new_pswd_confirm" id="new_pswd_confirm" placeholder="请重复新密码" required>
+                <span class="input-icon" id="new_pswd_confirm_icon"></span>
+            </div>
+            <button type="submit">更改密码</button>
+        </form>
+        <div id="msg"></div>
+        <p style="margin-top:24px;font-size:0.95em;">
+            <a href="/login">放弃更改</a>
+        </p>
+    </div>
+    <script src="{{ url_for('static', filename='icons.js') }}"></script>
+    <script src="{{ url_for('static', filename='newpswd.js') }}"></script>
+</body>

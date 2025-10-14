@@ -225,6 +225,28 @@ def check_user_password(username: str, password: str) -> bool:
     return False
 
 
+def change_user_password(username: str, new_password: str) -> bool:
+    conn = get_conn()
+    c = conn.cursor()
+
+    password_hash = generate_password_hash(new_password)
+    try:
+        c.execute(
+            """
+            UPDATE users SET password_hash = ?
+            WHERE username = ?;
+        """,
+            (password_hash, username,)
+        )
+        conn.commit()
+        return True
+    except:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+
 def get_uid_with_username(username: str) -> int:
     conn = get_conn()
     c = conn.cursor()
@@ -439,7 +461,8 @@ def reject_profile_request(server_cn: str, common_name: str) -> bool:
             SET is_rejected = TRUE
             WHERE server_common_name = ? AND common_name = ?;
         """,
-            (server_cn, common_name,))
+            (server_cn, common_name,)
+        )
         conn.commit()
         return True
     except:
