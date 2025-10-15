@@ -25,7 +25,7 @@ curl -s https://www.cloudflare.com/ips-v6 -o /tmp/cf_ipv6.txt
 {
     echo "# Cloudflare IPs - Auto generated"
 
-    echo "geo \$request_from_cf {"
+    echo "geo \$realip_remote_addr \$request_from_cf {"
     echo "    default 0;"
 
     while read ip; do
