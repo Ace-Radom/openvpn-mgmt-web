@@ -7,7 +7,7 @@ from flask import (
 )
 
 from app import db, profiles, utils, vpn_servers
-from app.email import gmail
+from app.email import mailgun
 
 bp = Blueprint("api", __name__)
 
@@ -36,7 +36,7 @@ def api_register():
         return jsonify({"success": False, "msg": "DB error"}), 500
 
     try:
-        gmail.send_email(
+        mailgun.send_email(
             email,
             "验证您的邮箱 - OpenVPN Mgmt",
             "verify_zhCN.html",

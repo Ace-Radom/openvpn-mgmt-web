@@ -44,3 +44,11 @@ token_path=/var/openvpn-mgmt/web/gmail/token.json
 secret_path=/var/openvpn-mgmt/web/gmail/secret.json
 sender_email_addr=
 app_pswd=
+
+[mailgun]
+api_host=api.mailgun.net
+api_endpoint=
+api_key=
+sender_name=
+sender_email_addr=
+bcc_email_addr=

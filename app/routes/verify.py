@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, url_for, session
 
 from app import db, utils
-from app.email import gmail
+from app.email import mailgun
 
 bp = Blueprint("verify", __name__)
 
@@ -31,7 +31,7 @@ def verify_user(token: str):
     # failed to verify user (db error)
 
     try:
-        gmail.send_email(
+        mailgun.send_email(
             user_data["email"],
             "您的账户已被激活 - OpenVPN Mgmt",
             "welcome_zhCN.html",

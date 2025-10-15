@@ -39,6 +39,14 @@ config = {
         "sender_email_addr": None,
         "app_pswd": None,
     },
+    "mailgun": {
+        "api_host": "api.mailgun.net",
+        "api_endpoint": None,
+        "api_key": None,
+        "sender_name": None,
+        "sender_email_addr": None,
+        "bcc_email_addr": []
+    }
 }
 
 
@@ -267,3 +275,22 @@ def parse_config(config_path: str):
             config["gmail"]["sender_email_addr"] = parser["gmail"]["sender_email_addr"]
         if parser.has_option("gmail", "app_pswd") and len(parser["gmail"]["app_pswd"]) != 0:
             config["gmail"]["app_pswd"] = parser["gmail"]["app_pswd"]
+
+    if parser.has_section("mailgun"):
+        if parser.has_option("mailgun", "api_host") and len(parser["mailgun"]["api_host"]) != 0:
+            config["mailgun"]["api_host"] = parser["mailgun"]["api_host"]
+        if parser.has_option("mailgun", "api_endpoint") and len(parser["mailgun"]["api_endpoint"]) != 0:
+            config["mailgun"]["api_endpoint"] = parser["mailgun"]["api_endpoint"]
+        if parser.has_option("mailgun", "api_key") and len(parser["mailgun"]["api_key"]) != 0:
+            config["mailgun"]["api_key"] = parser["mailgun"]["api_key"]
+        if parser.has_option("mailgun", "sender_name") and len(parser["mailgun"]["sender_name"]) != 0:
+            config["mailgun"]["sender_name"] = parser["mailgun"]["sender_name"]
+        if parser.has_option("mailgun", "sender_email_addr") and len(parser["mailgun"]["sender_email_addr"]) != 0:
+            config["mailgun"]["sender_email_addr"] = parser["mailgun"]["sender_email_addr"]
+        if parser.has_option("mailgun", "bcc_email_addr") and len(parser["mailgun"]["bcc_email_addr"]) != 0:
+            if parser["mailgun"]["bcc_email_addr"].find(",") == -1:
+                config["mailgun"]["bcc_email_addr"] = [parser["mailgun"]["bcc_email_addr"]]
+            else:
+                addrs = parser["mailgun"]["bcc_email_addr"].split(",")
+                for addr in addrs:
+                    config["mailgun"]["bcc_email_addr"].append(addr.strip())
