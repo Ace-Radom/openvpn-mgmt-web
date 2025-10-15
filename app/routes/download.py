@@ -47,5 +47,6 @@ def download_profiles(server_cn, common_name):
         )
     )
     response.headers["X-Profile-Common-Name"] = common_name
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
 
     return response
