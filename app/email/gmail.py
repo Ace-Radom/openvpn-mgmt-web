@@ -70,29 +70,27 @@ def create_email(
     reciever_email_addr: str, subject: str, template_name: str, context: dict
 ):
     template = templates.get_template(template_name)
-    # mail = MIMEText(template.render(context), "html", "utf-8")
-    # mail["from"] = config.config["gmail"]["sender_email_addr"]
-    # mail["to"] = reciever_email_addr
-    # mail["subject"] = subject
+    mail = MIMEText(template.render(context), "html", "utf-8")
+    mail["from"] = config.config["gmail"]["sender_email_addr"]
+    mail["to"] = reciever_email_addr
+    mail["subject"] = subject
 
-    print(template.render(context))
-
-    # return {"raw": urlsafe_b64encode(mail.as_bytes()).decode()}
+    return {"raw": urlsafe_b64encode(mail.as_bytes()).decode()}
 
 
 def send_email(
     reciever_email_addr: str, subject: str, template_name: str, context: dict
 ):
-    # service = auth_gmail_api()
+    service = auth_gmail_api()
 
     create_email(reciever_email_addr, subject, template_name, context)
 
-    # return (
-    #     service.users()
-    #     .messages()
-    #     .send(
-    #         userId="me",
-    #         body=create_email(reciever_email_addr, subject, template_name, context),
-    #     )
-    #     .execute()
-    # )
+    return (
+        service.users()
+        .messages()
+        .send(
+            userId="me",
+            body=create_email(reciever_email_addr, subject, template_name, context),
+        )
+        .execute()
+    )

@@ -1,7 +1,6 @@
 import os
 import smtplib
 from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader
 
 from app import config
