@@ -11,6 +11,7 @@ templates = Environment(
     )
 )
 
+
 def create_email(
     reciever_email_addr: str, subject: str, template_name: str, context: dict
 ):
@@ -22,13 +23,19 @@ def create_email(
 
     return mail
 
+
 def send_email(
     reciever_email_addr: str, subject: str, template_name: str, context: dict
 ):
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(config.config["gmail"]["sender_email_addr"], config.config["gmail"]["app_pswd"])
-            server.send_message(create_email(reciever_email_addr, subject, template_name, context))
+            server.login(
+                config.config["gmail"]["sender_email_addr"],
+                config.config["gmail"]["app_pswd"],
+            )
+            server.send_message(
+                create_email(reciever_email_addr, subject, template_name, context)
+            )
         return True
     except Exception as e:
         print(e)

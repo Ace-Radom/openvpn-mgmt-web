@@ -40,17 +40,21 @@ def post(
     endpoint: str = "",
     use_https: bool = False,
     timeout: int = 5,
-    auth = None,
+    auth=None,
     data: dict = {},
     crt_verify: bool = True,
-    requests_send_with_data_param: bool = False
+    requests_send_with_data_param: bool = False,
 ) -> tuple[int, dict]:
     url = build_url(host, port, endpoint, use_https)
     try:
         if requests_send_with_data_param:
-            response = requests.post(url, auth=auth, data=data, timeout=timeout, verify=crt_verify)
+            response = requests.post(
+                url, auth=auth, data=data, timeout=timeout, verify=crt_verify
+            )
         else:
-            response = requests.post(url, auth=auth, json=data, timeout=timeout, verify=crt_verify)
+            response = requests.post(
+                url, auth=auth, json=data, timeout=timeout, verify=crt_verify
+            )
         return (response.status_code, response.json())
     except Exception as e:
         return (-1, {"msg": e})

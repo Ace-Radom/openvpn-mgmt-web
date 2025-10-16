@@ -11,6 +11,7 @@ templates = Environment(
     )
 )
 
+
 def send_email(
     reciever_email_addr: str, subject: str, template_name: str, context: dict
 ):
@@ -33,6 +34,6 @@ def send_email(
         use_https=True,
         auth=auth,
         data=data,
-        requests_send_with_data_param=True
+        requests_send_with_data_param=True,
     )
     return status_code == 200
