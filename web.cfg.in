@@ -19,6 +19,7 @@ allow_all_registration_request_under_production_env=0
 
 [vpn_server]
 server_cn={list:server_common_names}
+server_default_crt=
 
 [vpn_server:{str:server_common_name}]
 ip=
@@ -30,6 +31,7 @@ enable_profile_cache=1
 profile_cache_refresh_interval=3600  # 1h
 profile_cache_expire_after=18000     # 5h
 enable_crt_verify=1
+server_crt=                          # if defined, this will override vpn_server:server_default_crt
 
 # ...
 

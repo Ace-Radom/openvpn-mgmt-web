@@ -25,7 +25,7 @@ config = {
         "zzds_school_wlan_ip": None,
         "allow_all_registration_request_under_production_env": False,
     },
-    "vpn_server": {"server_cn": []},  # common names
+    "vpn_server": {"server_cn": [], "server_default_crt": None},
     "vpn_server_data": {},  # cn as key
     "redis": {
         "profile_key_prefix": "openvpn-mgmt-web-profile:",
@@ -164,6 +164,13 @@ def parse_config(config_path: str):
                 cns = parser["vpn_server"]["server_cn"].split(",")
                 for cn in cns:
                     config["vpn_server"]["server_cn"].append(cn.strip())
+        if (
+            parser.has_option("vpn_server", "server_default_crt")
+            and len(parser["vpn_server"]["server_default_crt"]) != 0
+        ):
+            config["vpn_server"]["server_default_crt"] = parser["vpn_server"][
+                "server_default_crt"
+            ]
 
     for cn in config["vpn_server"]["server_cn"]:
         section_name = f"vpn_server:{ cn }"
@@ -209,7 +216,7 @@ def parse_config(config_path: str):
                 )
             if (
                 parser.has_option(section_name, "enable_profile_cache")
-                and len(parser[section_name]["enable_profile_cache"])
+                and len(parser[section_name]["enable_profile_cache"]) != 0
                 and parser[section_name]["enable_profile_cache"].isdigit()
             ):
                 config["vpn_server_data"][cn]["enable_profile_cache"] = (
@@ -225,7 +232,7 @@ def parse_config(config_path: str):
                 )
             if (
                 parser.has_option(section_name, "profile_cache_expire_after")
-                and len(parser[section_name]["profile_cache_expire_after"])
+                and len(parser[section_name]["profile_cache_expire_after"]) != 0
                 and parser[section_name]["profile_cache_expire_after"].isdigit()
             ):
                 config["vpn_server_data"][cn]["profile_cache_expire_after"] = int(
@@ -233,12 +240,19 @@ def parse_config(config_path: str):
                 )
             if (
                 parser.has_option(section_name, "enable_crt_verify")
-                and len(parser[section_name]["enable_crt_verify"])
+                and len(parser[section_name]["enable_crt_verify"]) != 0
                 and parser[section_name]["enable_crt_verify"].isdigit()
             ):
                 config["vpn_server_data"][cn]["enable_crt_verify"] = (
                     int(parser[section_name]["enable_crt_verify"]) != 0
                 )
+            if (
+                parser.has_option(section_name, "server_crt")
+                and len(parser[section_name]["server_crt"]) != 0
+            ):
+                config["vpn_server_data"][cn]["server_crt"] = parser[section_name][
+                    "server_crt"
+                ]
 
     if parser.has_section("redis"):
         if (

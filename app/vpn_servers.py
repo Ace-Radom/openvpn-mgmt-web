@@ -14,6 +14,7 @@ class vpn_server:
         profile_cache_refresh_interval: int,
         profile_cache_expire_after: int,
         enable_crt_verify: bool,
+        server_crt: str,
     ) -> None:
         self._ip = ip
         self._port = port
@@ -24,6 +25,7 @@ class vpn_server:
         self._profile_cache_refresh_interval = profile_cache_refresh_interval
         self._profile_cache_expire_after = profile_cache_expire_after
         self._enable_crt_verify = enable_crt_verify
+        self._server_crt = server_crt
         return
 
     def _get(self, endpoint: str) -> tuple[int, dict]:
@@ -33,6 +35,7 @@ class vpn_server:
             endpoint=endpoint,
             use_https=self._use_https,
             crt_verify=self._enable_crt_verify,
+            crt_path=self._server_crt,
         )
 
     def _post(self, endpoint: str, data: dict) -> tuple[int, dict]:
@@ -43,6 +46,7 @@ class vpn_server:
             use_https=self._use_https,
             data=data,
             crt_verify=self._enable_crt_verify,
+            crt_path=self._server_crt,
         )
 
     def _download(self, endpoint: str, download_to: str) -> tuple[int, dict]:
@@ -53,6 +57,7 @@ class vpn_server:
             use_https=self._use_https,
             crt_verify=self._enable_crt_verify,
             download_to=download_to,
+            crt_path=self._server_crt,
         )
 
     def check_alive(self) -> bool:
@@ -107,6 +112,14 @@ vpn_servers: dict[str, vpn_server] = {}
 def init():
     cns = config.config["vpn_server"]["server_cn"]
     for cn in cns:
+        if (
+            "server_crt" in config.config["vpn_server_data"][cn]
+            and config.config["vpn_server_data"][cn]["server_crt"] is not None
+        ):
+            server_crt = config.config["vpn_server_data"][cn]["server_crt"]
+        else:
+            server_crt = config.config["vpn_server"]["server_default_crt"]
+
         vpn_servers[cn] = vpn_server(
             config.config["vpn_server_data"][cn]["ip"],
             config.config["vpn_server_data"][cn]["port"],
@@ -117,6 +130,7 @@ def init():
             config.config["vpn_server_data"][cn]["profile_cache_refresh_interval"],
             config.config["vpn_server_data"][cn]["profile_cache_expire_after"],
             config.config["vpn_server_data"][cn]["enable_crt_verify"],
+            server_crt,
         )
 
 
